@@ -1,0 +1,7 @@
+services:
+  solc:
+    image: ethereum/solc:stable
+    volumes:
+      - ./data:/sources
+      - ./.output/:/output
+    command: "--output-dir /output --overwrite --abi --bin --bin-runtime /sources/HashManager.sol"

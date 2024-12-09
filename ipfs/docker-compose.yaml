@@ -1,0 +1,60 @@
+services:
+
+  ipfs_boot:
+    image: ipfs/kubo:v0.31.0
+    volumes:
+      - ./.nodes/bootstrap:/data/ipfs
+      - ./.nodes/:/network
+      - ../utils/ipfs_swarm_key_creator/.output/swarm.key:/network/swarm.key
+      - ./init.sh:/container-init.d/init.sh
+    environment:
+      IPFS_SWARM_KEY_FILE: /network/swarm.key
+      P2P_PORT: 4001
+      RPC_PORT: 5001
+    networks:
+      truststorage:
+        ipv4_address: 172.20.0.12
+
+  ipfs_node0:
+    image: ipfs/kubo:v0.31.0
+    volumes:
+      - ./.nodes/node0:/data/ipfs
+      - ./.nodes/:/network
+      - ../utils/ipfs_swarm_key_creator/.output/swarm.key:/network/swarm.key
+      - ./init.sh:/container-init.d/init.sh
+    environment:
+      IPFS_SWARM_KEY_FILE: /network/swarm.key
+      BOOTSTRAPS: bootstrap@172.20.0.12
+      P2P_PORT: 4001
+      RPC_PORT: 5001
+    networks:
+      truststorage:
+        ipv4_address: 172.20.0.13
+    depends_on:
+      - ipfs_boot
+
+  ipfs_node1:
+    image: ipfs/kubo:v0.31.0
+    volumes:
+      - ./.nodes/node:/data/ipfs
+      - ./.nodes/:/network
+      - ../utils/ipfs_swarm_key_creator/.output/swarm.key:/network/swarm.key
+      - ./init.sh:/container-init.d/init.sh
+    environment:
+      IPFS_SWARM_KEY_FILE: /network/swarm.key
+      BOOTSTRAPS: bootstrap@172.20.0.12
+      P2P_PORT: 4001
+      RPC_PORT: 5001
+    networks:
+      truststorage:
+        ipv4_address: 172.20.0.14
+    depends_on:
+      - ipfs_boot
+
+networks:
+  truststorage:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16

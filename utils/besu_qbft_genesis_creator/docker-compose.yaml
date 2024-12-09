@@ -1,0 +1,13 @@
+services:
+  besu_qbft_genesis_creator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../eth_account_creator/.output:/validators
+      - ../solidity_compiler/.output:/contracts
+      - ./data:/sources
+      - ./.output:/output
+    environment:
+      VALIDATORS: bootnode,node0
+      CONTRACTS: HashManager

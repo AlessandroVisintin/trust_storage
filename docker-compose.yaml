@@ -1,0 +1,50 @@
+include:
+  - besu/docker-compose.yaml
+  - ipfs/docker-compose.yaml
+
+services:
+
+  rest:
+    build:
+      context: ./rest
+      dockerfile: Dockerfile
+    image: rest
+    environment:
+      IPFS_URL: "http://172.20.0.12:5001"
+    networks:
+      truststorage:
+        ipv4_address: 172.20.0.22
+    depends_on:
+      - ipfs_boot
+
+  client:
+    profiles:
+      - testing
+    build:
+      context: ./truststorageclient
+      dockerfile: Dockerfile
+    image: client
+    volumes:
+      - ./utils/solidity_compiler/.output/HashManager.abi:/src/tests/data/contracts/HashManager.abi
+      - ./utils/besu_qbft_genesis_creator/.output/HashManager.address:/src/tests/data/contracts/HashManager.address
+    networks:
+      - truststorage
+    environment:
+      - REST_ENDPOINT=http://172.20.0.22:8080
+      - IPFS_ENDPOINT=http://172.20.0.12:5001
+      - BESU_ENDPOINT=http://172.20.0.2:8545
+      - CLIENT_PRVKEY_PATH=/src/tests/data/keys/user1/prvkey.pem
+      - CLIENT_PUBKEY_PATH=/src/tests/data/keys/user1/pubkey.pem
+      - CONTRACT_ADDR_PATH=/src/tests/data/contracts/HashManager.address
+      - CONTRACT_JSON_PATH=/src/tests/data/contracts/HashManager.abi
+    depends_on:
+      - rest
+      - besu_boot
+
+networks:
+  truststorage:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
