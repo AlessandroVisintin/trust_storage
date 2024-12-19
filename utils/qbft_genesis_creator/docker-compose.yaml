@@ -4,10 +4,11 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ../eth_account_creator/.output:/validators
-      - ../solidity_compiler/.output:/contracts
       - ./data:/sources
       - ./.output:/output
+      - ../eth_account_creator/.output:/nodes
+      - ../solidity_compiler/.output:/contracts
     environment:
-      VALIDATORS: bootnode,node0
+      BOOTNODES: node0
+      VALIDATORS: node0
       CONTRACTS: HashManager

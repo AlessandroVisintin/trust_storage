@@ -16,15 +16,39 @@ fn main() -> io::Result<()> {
     let validators = read_validators()?;
     let extra_data = encode_extra_data(&validators);
     let alloc = read_contracts()?;
+    let bootnodes = generate_bootnodes()?;
 
     json["extraData"] = json!(format!("0x{}", extra_data));
     json["alloc"] = json!(alloc);
+    json["bootnodes"] = json!(bootnodes);
 
     let output = serde_json::to_string_pretty(&json)?;
     let mut output_file = fs::File::create("/output/genesis.json")?;
     output_file.write_all(output.as_bytes())?;
 
     Ok(())
+}
+
+fn generate_bootnodes() -> io::Result<Vec<String>> {
+    let bootnodes_env = env::var("BOOTNODES").unwrap_or_default();
+    if bootnodes_env.is_empty() {
+        return Ok(Vec::new());
+    }
+    let bootnode_names: Vec<&str> = bootnodes_env.split(',').map(|s| s.trim()).collect();
+    let mut bootnodes = Vec::new();
+
+    for node_name in bootnode_names {
+        let pubkey_path = format!("/keys/{node_name}/.pub");
+        let mut file = fs::File::open(pubkey_path)?;
+        let mut pubkey = String::new();
+        file.read_to_string(&mut pubkey)?;
+
+        let clean_pubkey = pubkey.trim().strip_prefix("0x").unwrap_or(pubkey.trim());
+        let enode = format!("enode://{}@{{{}}}", clean_pubkey, node_name);
+        bootnodes.push(enode);
+    }
+
+    Ok(bootnodes)
 }
 
 fn to_checksum_address(address: &str) -> Result<String, String> {
