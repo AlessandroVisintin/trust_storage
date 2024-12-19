@@ -38,13 +38,13 @@ fn generate_bootnodes() -> io::Result<Vec<String>> {
     let mut bootnodes = Vec::new();
 
     for node_name in bootnode_names {
-        let pubkey_path = format!("/keys/{node_name}/.pub");
+        let pubkey_path = format!("/nodes/{node_name}/.pub");
         let mut file = fs::File::open(pubkey_path)?;
         let mut pubkey = String::new();
         file.read_to_string(&mut pubkey)?;
 
         let clean_pubkey = pubkey.trim().strip_prefix("0x").unwrap_or(pubkey.trim());
-        let enode = format!("enode://{}@{{{}}}", clean_pubkey, node_name);
+        let enode = format!("enode://{}@{}", clean_pubkey, node_name);
         bootnodes.push(enode);
     }
 
@@ -100,7 +100,7 @@ fn read_validators() -> io::Result<Vec<String>> {
     let validator_names: Vec<&str> = validators_env.split(',').map(|s| s.trim()).collect();
     let mut validators = Vec::new();
     for validator in validator_names {
-        let address_path = format!("/validators/{validator}/.address");
+        let address_path = format!("/nodes/{validator}/.address");
         let mut file = fs::File::open(address_path)?;
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;

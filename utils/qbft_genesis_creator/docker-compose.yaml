@@ -1,5 +1,5 @@
 services:
-  besu_qbft_genesis_creator:
+  qbft_genesis_creator:
     build:
       context: .
       dockerfile: Dockerfile
