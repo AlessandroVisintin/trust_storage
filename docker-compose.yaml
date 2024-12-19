@@ -17,7 +17,7 @@ services:
     depends_on:
       - ipfs_boot
 
-  client:
+  client1:
     profiles:
       - testing
     build:

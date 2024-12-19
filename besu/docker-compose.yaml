@@ -1,64 +1,72 @@
 services:
 
-  besu_boot:
+  besu_node:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../
+      dockerfile: ./besu/Dockerfile
     image: besu_node
+#    ports:
+#      - ${BESU_RPC_NETWORK:+${BESU_RPC_PORT:-8545-8561}}:8545
     volumes:
-      - ./.nodes:/data
-      - ../utils/eth_account_creator/.output/bootnode:/sources/account
-      - ../utils/besu_qbft_genesis_creator/.output:/sources/genesis
-      - ../utils/eth_account_creator/.output/:/sources/nodes
-    environment:
-      NODE_NAME: bootnode
-      BOOTNODES: bootnode@172.20.0.2
-      P2P_PORT: 30303
-      RPC_PORT: 8545
-    networks:
-      truststorage:
-        ipv4_address: 172.20.0.2
+#      - ${BESU_KEY_PATH}:/sources/account
+      - ${BESU_DATA_PATH}:/opt/besu/
+#    environment:
+#      - BOOTNODES: ${BESU_BOOTNODES}
 
-  besu_node0:
-    image: besu_node
-    volumes:
-      - ./.nodes:/data
-      - ../utils/eth_account_creator/.output/node0:/sources/account
-      - ../utils/besu_qbft_genesis_creator/.output:/sources/genesis
-      - ../utils/eth_account_creator/.output/:/sources/nodes
-    environment:
-      NODE_NAME: node0
-      BOOTNODES: bootnode@172.20.0.2
-      P2P_PORT: 30303
-      RPC_PORT: 8545
-    networks:
-      truststorage:
-        ipv4_address: 172.20.0.3
-    depends_on:
-      - besu_boot
+#     volumes:
+#       - ./.nodes:/data
+#       - ../utils/eth_account_creator/.output/bootnode:/sources/account
+#       - ../utils/besu_qbft_genesis_creator/.output:/sources/genesis
+#       - ../utils/eth_account_creator/.output/:/sources/nodes
+#     environment:
+#       NODE_NAME: bootnode
+#       BOOTNODES: bootnode@172.20.0.2
+#       P2P_PORT: 30303
+#       RPC_PORT: 8545
+#     networks:
+#       truststorage:
+#         ipv4_address: 172.20.0.2
 
-  besu_node1:
-    image: besu_node
-    volumes:
-      - ./.nodes:/data
-      - ../utils/eth_account_creator/.output/node1:/sources/account
-      - ../utils/besu_qbft_genesis_creator/.output:/sources/genesis
-      - ../utils/eth_account_creator/.output/:/sources/nodes
-    environment:
-      NODE_NAME: node1
-      BOOTNODES: bootnode@172.20.0.2
-      P2P_PORT: 30303
-      RPC_PORT: 8545
-    networks:
-      truststorage:
-        ipv4_address: 172.20.0.4
-    depends_on:
-      - besu_boot
+#   besu_node0:
+#     image: besu_node
+#     volumes:
+#       - ./.nodes:/data
+#       - ../utils/eth_account_creator/.output/node0:/sources/account
+#       - ../utils/besu_qbft_genesis_creator/.output:/sources/genesis
+#       - ../utils/eth_account_creator/.output/:/sources/nodes
+#     environment:
+#       NODE_NAME: node0
+#       BOOTNODES: bootnode@172.20.0.2
+#       P2P_PORT: 30303
+#       RPC_PORT: 8545
+#     networks:
+#       truststorage:
+#         ipv4_address: 172.20.0.3
+#     depends_on:
+#       - besu_boot
 
-networks:
-  truststorage:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.20.0.0/16
+#   besu_node1:
+#     image: besu_node
+#     volumes:
+#       - ./.nodes:/data
+#       - ../utils/eth_account_creator/.output/node1:/sources/account
+#       - ../utils/besu_qbft_genesis_creator/.output:/sources/genesis
+#       - ../utils/eth_account_creator/.output/:/sources/nodes
+#     environment:
+#       NODE_NAME: node1
+#       BOOTNODES: bootnode@172.20.0.2
+#       P2P_PORT: 30303
+#       RPC_PORT: 8545
+#     networks:
+#       truststorage:
+#         ipv4_address: 172.20.0.4
+#     depends_on:
+#       - besu_boot
+
+# networks:
+#   truststorage:
+#     driver: bridge
+#     ipam:
+#       driver: default
+#       config:
+#         - subnet: 172.20.0.0/16

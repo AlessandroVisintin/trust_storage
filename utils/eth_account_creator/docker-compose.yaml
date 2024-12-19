@@ -6,4 +6,4 @@ services:
     volumes:
       - ./.output:/output
     environment:
-      ACCOUNTS: bootnode,node0,node1,user0,user1
+      ACCOUNTS: node0,node1

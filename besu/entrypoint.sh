@@ -2,13 +2,11 @@
 
 set -e
 
-if [ -z "$NODE_NAME" ]; then
-    echo "Error: NODE_NAME environment variable is not set"
-    exit 1
-fi
-data_dir="/data/$NODE_NAME"
+hostname=$(hostname)
+data_dir="/opt/besu/${hostname}"
 mkdir -p "$data_dir"
 
+sleep infinity
 
 if [ -z "$BOOTNODES" ]; then
     echo "Error: BOOTNODES environment variable is not set"
@@ -31,14 +29,15 @@ besu \
     --genesis-file="/sources/genesis/genesis.json" \
     --node-private-key-file="/sources/account/.prv" \
     --min-gas-price=0 \
-    --p2p-host=$ip_address \
-    --p2p-port=$P2P_PORT \
+    --p2p-port-enabled \
+    --p2p-host=127.0.0.1 \
+    --p2p-port=8545 \
     --rpc-http-enabled \
-    --rpc-http-host=$ip_address \
-    --rpc-http-port=$RPC_PORT \
+    --rpc-http-host=127.0.0.1 \
+    --rpc-http-port=30303 \
+    --rpc-http-cors-origins=\"all\" \
     --rpc-http-api=ETH,NET,QBFT \
     --host-allowlist=* \
-    --rpc-http-cors-origins=\"all\" \
     --bootnodes=$bootnodes \
     > "$data_dir/.log" 2>&1
 
