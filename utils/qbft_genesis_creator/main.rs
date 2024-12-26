@@ -1,7 +1,7 @@
 use ethaddr::Address;
 use hex;
 use std::fs;
-use std::io::{self, Read, Write};
+use std::io::{self, Read, Write, BufWriter};
 use std::env;
 use rlp::{RlpStream};
 use serde_json::{Value, json};
@@ -16,15 +16,20 @@ fn main() -> io::Result<()> {
     let validators = read_validators()?;
     let extra_data = encode_extra_data(&validators);
     let alloc = read_contracts()?;
-    let bootnodes = generate_bootnodes()?;
 
     json["extraData"] = json!(format!("0x{}", extra_data));
     json["alloc"] = json!(alloc);
-    json["bootnodes"] = json!(bootnodes);
 
     let output = serde_json::to_string_pretty(&json)?;
     let mut output_file = fs::File::create("/output/genesis.json")?;
     output_file.write_all(output.as_bytes())?;
+
+    let bootnodes = generate_bootnodes()?;
+    let bootnodes_file = fs::File::create("/output/bootnodes.txt")?;
+    let mut writer = BufWriter::new(bootnodes_file);
+    for bootnode in &bootnodes {
+        writeln!(writer, "{}", bootnode)?;
+    }
 
     Ok(())
 }

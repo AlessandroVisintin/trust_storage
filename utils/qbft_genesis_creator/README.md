@@ -27,11 +27,11 @@ The application requires the following inputs:
 
 The application generates the following outputs in the `./output` directory:
 
-1. `genesis.json`: The main genesis file for the Besu QBFT network, which includes:
-   - A custom `bootnodes` field containing a list of enode URLs for available bootnodes. Each enode URL follows the format `"enode://..pubkey..@{node name}"`, where `{node name}` serves as a placeholder for the future IP:PORT of the node.
-   - An `alloc` field that pre-deploys the specified contracts with their bytecode and initial balance.
+1. `genesis.json`: The main genesis file for the Besu QBFT network, which includes an `alloc` field that pre-deploys the specified contracts with their bytecode and initial balance.
 
-2. `{contract_name}.address`: A file for each contract containing its calculated address
+2. `{contract_name}.address`: A file for each contract containing its calculated address.
+
+3. `bootnodes.txt`: a text file containing a list of enode URLs for available bootnodes (one per line). Each enode URL follows the format `"enode://..pubkey..@{node name}"`, where `{node name}` serves as a placeholder for the future IP:PORT of the node.
 
 ## Usage
 
@@ -61,4 +61,4 @@ environment:
 docker-compose up
 ```
 
-5. Retrieve the generated `genesis.json` and contract address files from the output directory.
+5. Retrieve the generated `genesis.json`, `bootnodes.txt` and contract address files from the output directory.

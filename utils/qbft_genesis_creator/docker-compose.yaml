@@ -9,6 +9,6 @@ services:
       - ../eth_account_creator/.output:/nodes
       - ../solidity_compiler/.output:/contracts
     environment:
-      BOOTNODES: node0
+      BOOTNODES: node0,node1
       VALIDATORS: node0
       CONTRACTS: HashManager

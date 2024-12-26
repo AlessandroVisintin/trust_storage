@@ -6,7 +6,7 @@ import os
 import requests
 import time
 
-from truststorageclient.utils import pem_to_hex
+from trust_storage_client.utils import pem_to_hex
 
 
 try:
@@ -70,7 +70,7 @@ def get_chainid() -> int:
     r = post(d)
     return r["result"]
 
-def add_besu(cid=str) -> None:
+def add_besu(document=str) -> None:
     account = Account.from_key(pem_to_hex(CLIENT_PRVKEY_PATH))
     contract_address = read_contract_address()
     contract_abi = read_contract_abi()
@@ -79,7 +79,7 @@ def add_besu(cid=str) -> None:
     tx = {
         "from": account.address,
         "to": contract.address,
-        "data": contract.encode_abi(abi_element_identifier="add", args=[Web3.keccak(text=cid)]),
+        "data": contract.encode_abi(abi_element_identifier="add", args=[Web3.keccak(text=document)]),
         "nonce": get_nonce(account.address),
         "chainId": get_chainid(),
         "gas": "0x1ffffffff",
@@ -90,7 +90,7 @@ def add_besu(cid=str) -> None:
     d = {"jsonrpc": "2.0", "method": "eth_sendRawTransaction", "params": [raw], "id": 1}
     r = post(d)
 
-    manage_receipt( wait_receipt( r["result"] ) )
+    return manage_receipt( wait_receipt( r["result"] ) )
 
 def get_besu(cid:str) -> None:
     contract_address = read_contract_address()

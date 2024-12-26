@@ -4,14 +4,15 @@ from truststorageclient.besuclient import get_chainid, add_besu, get_besu, depre
 print(f"Check connectivity with BESU node..")
 print( get_chainid() )
 
-cid = "test cid"
+with open() as f:
+    bom = f.read()
 
 print(f"Add test CID..")
-add_besu(cid)
+add_besu(bom)
 
 print(f"Add already exisitng hash..")
 try:
-    add_besu(cid)
+    add_besu(bom)
     raise AssertionError("Expected RuntimeError")
 except RuntimeError:
     print("RuntimeError correctly triggered")
