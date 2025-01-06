@@ -6,7 +6,7 @@ import os
 import requests
 import time
 
-from trust_storage_client.utils import pem_to_hex
+from trust_storage_client.utils import load_hex_key
 
 
 try:
@@ -70,16 +70,17 @@ def get_chainid() -> int:
     r = post(d)
     return r["result"]
 
-def add_besu(document=str) -> None:
-    account = Account.from_key(pem_to_hex(CLIENT_PRVKEY_PATH))
+def add_besu(document=str) -> dict:
+    account = Account.from_key(load_hex_key(CLIENT_PRVKEY_PATH))
     contract_address = read_contract_address()
     contract_abi = read_contract_abi()
     contract = Web3().eth.contract(address=contract_address, abi=contract_abi)
+    ahash = Web3.keccak(text=document)
 
     tx = {
         "from": account.address,
         "to": contract.address,
-        "data": contract.encode_abi(abi_element_identifier="add", args=[Web3.keccak(text=document)]),
+        "data": contract.encode_abi(abi_element_identifier="add", args=[ahash]),
         "nonce": get_nonce(account.address),
         "chainId": get_chainid(),
         "gas": "0x1ffffffff",
@@ -90,25 +91,27 @@ def add_besu(document=str) -> None:
     d = {"jsonrpc": "2.0", "method": "eth_sendRawTransaction", "params": [raw], "id": 1}
     r = post(d)
 
-    return manage_receipt( wait_receipt( r["result"] ) )
+    logs = manage_receipt( wait_receipt( r["result"] ) )
+    return {"hash" : f'0x{ahash.hex()}', "logs" : logs}
 
-def get_besu(cid:str) -> None:
+def get_besu(ahash:str) -> bool:
     contract_address = read_contract_address()
     contract_abi = read_contract_abi()
     contract = Web3().eth.contract(address=contract_address, abi=contract_abi)
-    data = contract.encode_abi(abi_element_identifier="read", args=[Web3.keccak(text=cid)])
+    data = contract.encode_abi(abi_element_identifier="read", args=[Web3.to_bytes(hexstr=ahash)])
     tx = {"to": contract.address, "data": data }
 
     d = {"jsonrpc": "2.0", "method": "eth_call", "params": [tx, "latest"], "id": 53}
     r = post(d)
     if "result" in r:
-        return decode(['uint256', 'address'], bytes.fromhex(r["result"][2:])) 
+        return True
+        # return decode(['uint256', 'address'], bytes.fromhex(r["result"][2:]))
     elif "error" in r:
         raise RuntimeError(r["error"]["message"])
     raise ValueError(f"Unexpected response format: {r}")
 
-def deprecate_besu(cid=str) -> None:
-    account = Account.from_key(pem_to_hex(CLIENT_PRVKEY_PATH))
+def deprecate_besu(ahash=str) -> bool:
+    account = Account.from_key(load_hex_key(CLIENT_PRVKEY_PATH))
     contract_address = read_contract_address()
     contract_abi = read_contract_abi()
     contract = Web3().eth.contract(address=contract_address, abi=contract_abi)
@@ -116,7 +119,7 @@ def deprecate_besu(cid=str) -> None:
     tx = {
         "from": account.address,
         "to": contract.address,
-        "data": contract.encode_abi(abi_element_identifier="deprecate", args=[Web3.keccak(text=cid)]),
+        "data": contract.encode_abi(abi_element_identifier="deprecate", args=[Web3.to_bytes(hexstr=ahash)]),
         "nonce": get_nonce(account.address),
         "chainId": get_chainid(),
         "gas": "0x1ffffffff",
@@ -127,4 +130,5 @@ def deprecate_besu(cid=str) -> None:
     d = {"jsonrpc": "2.0", "method": "eth_sendRawTransaction", "params": [raw], "id": 1}
     r = post(d)
 
-    manage_receipt( wait_receipt( r["result"] ) )
+    manage_receipt( wait_receipt( r["result"] ))
+    return True

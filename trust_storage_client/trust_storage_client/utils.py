@@ -25,6 +25,12 @@ def generate_ec(folder=None, curve="secp256k1") :
             f.write(public_pem)
     return private_pem, public_pem
 
+
+def load_hex_key(keypath:str):
+    with open(keypath, 'r') as key_file:
+        return key_file.read().strip()
+
+
 def pem_to_hex(keypath:str):
     with open(keypath, 'rb') as pem_file:
         prv = serialization.load_pem_private_key(
