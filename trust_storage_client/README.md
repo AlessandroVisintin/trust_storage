@@ -137,15 +137,8 @@ try:
 except RuntimeError:
     print("Document does not exist")
 
-# Trying to deprecate an already deprecated document
+# Trying to deprecate a non-existent / already deprecated document
 try:
     deprecate_besu(document_hash)
 except RuntimeError:
     print("Document already deprecated")
-
-# Trying to get a deprecated document
-try:
-    get_besu(document_hash)
-except RuntimeError:
-    print("Document has been deprecated")
-```
