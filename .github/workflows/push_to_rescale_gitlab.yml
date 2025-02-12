@@ -1,0 +1,21 @@
+name: Sync Repo to GitLab
+on:
+  push:
+    branches: 
+      - main
+jobs:
+  replicate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Configure Git
+        run: |
+          git config --global user.name "${{ github.event.pusher.name }}"
+          git config --global user.email "${{ github.event.pusher.email }}"
+      - name: Push to GitLab
+        run: |
+          git remote set-url origin "https://oauth2:${RESCALE_GITLAB_ACCESS_TOKEN}@gitlab.rescale-project.eu/rescale/trust_storage.git
+          git push origin master
