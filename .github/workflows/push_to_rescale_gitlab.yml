@@ -20,13 +20,15 @@ jobs:
         run: |
           git config --global user.name "${{ github.event.pusher.name }}"
           git config --global user.email "${{ github.event.pusher.email }}"
-          
+
       - name: Remove .github folder for GitLab sync
         run: |
           git rm -r --cached .github || true
-          git commit -m "${{ github.event.head_commit.message }}" || true
-      
+          git commit -m "Exclude .github folder from GitLab sync" || true
+
       - name: Push to GitLab
         run: |
+          
           git remote set-url origin https://githubAutomation:${{ secrets.RESCALE_GITLAB_ACCESS_TOKEN }}@gitlab.rescale-project.eu/rescale/trust_storage.git
+          git push origin +HEAD^:main
           git push origin main
