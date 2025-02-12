@@ -41,6 +41,8 @@ fi
 echo "Final bootnodes: $bootnodes"
 
 data_dir=/sources/data
+if [ ! -d "$data_dir" ]; then mkdir -p "$data_dir"; fi
+
 besu \
     --data-path=$data_dir \
     --genesis-file="/sources/network/genesis.json" \
