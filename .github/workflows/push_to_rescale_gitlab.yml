@@ -24,7 +24,7 @@ jobs:
       - name: Remove .github folder for GitLab sync
         run: |
           git rm -r --cached .github || true
-          git commit -m "Exclude .github folder from GitLab sync" || true
+          git commit -m "${{ github.event.head_commit.message }}" || true
       
       - name: Push to GitLab
         run: |
