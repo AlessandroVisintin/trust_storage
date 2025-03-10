@@ -1,0 +1,7 @@
+services:
+  solc:
+    image: ethereum/solc:stable
+    volumes:
+      - ../contracts:/sources
+      - ../build:/output
+    command: "--output-dir /output --overwrite --abi --bin --bin-runtime /sources/${CONTRACT_NAME:?Error: CONTRACT_NAME is required}.sol"

@@ -28,7 +28,6 @@ jobs:
 
       - name: Push to GitLab
         run: |
-          
           git remote set-url origin https://githubAutomation:${{ secrets.RESCALE_GITLAB_ACCESS_TOKEN }}@gitlab.rescale-project.eu/rescale/trust_storage.git
           git push origin +HEAD^:main
           git push origin main
