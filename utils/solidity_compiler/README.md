@@ -1,53 +1,44 @@
-# Solidity Compiler Docker App
+# Solidity Compiler
 
-This Docker application provides a convenient way to compile Solidity smart contracts using the official Ethereum Solidity compiler (solc) in a containerized environment.
+Docker-based utility for compiling Ethereum Solidity contracts.
 
 ## Overview
 
-The app uses the `ethereum/solc:stable` image to compile Solidity contracts. It mounts local directories for input and output, allowing you to easily manage your source files and compilation results.
+This tool automatically compiles all Solidity (`.sol`) files from the `../contracts` directory and outputs the compiled artifacts to `../build`.
 
-## Configuration
+## Prerequisites
 
-The `docker-compose.yml` file defines a single service named `solc`:
-
-```yaml
-services:
-    solc:
-        image: ethereum/solc:stable
-        volumes:
-            - ./data:/sources
-            - ./.output/:/output
-        command: "--output-dir /output --overwrite --abi --bin --bin-runtime /sources/HashManager.sol"
-```
-
-
-## Inputs and Outputs
-
-### Inputs
-
-- **Source Files**: Place your Solidity source files in the `./data` directory on your host machine. This directory is mounted to `/sources` inside the container.
-- **Target File**: Set the command in the docker-compose file to compile the specific file (example: `/sources/HashManager.sol`).
-
-### Outputs
-
-The compiler generates output files in the `./.output/`. The following output files are generated:
-
-- **ABI (Application Binary Interface)**: JSON file describing the contract's interface.
-- **Binary**: Raw compiled bytecode of the contract.
-- **Binary Runtime**: Runtime bytecode of the contract, which excludes the constructor and initialization code.
-
-## Compiler Options
-
-The command uses several options to control the compilation process:
-
-- `--output-dir /output`: Specifies the output directory for compiled files.
-- `--overwrite`: Allows overwriting existing files in the output directory.
-- `--abi`: Generates the ABI (Application Binary Interface) file.
-- `--bin`: Generates the binary (bytecode) file.
-- `--bin-runtime`: Generates the runtime binary file.
+- Docker
+- Docker Compose
 
 ## Usage
 
-1. Place your Solidity source files in the `./data` directory.
-2. Run the Docker container using `docker-compose up`.
-4. Check the `./.output/` directory for the compiled files.
+1. Place your Solidity files in the `contracts/` directory (at the project root)
+2. Run the compilation script:
+
+```bash
+cd utils/solidity_compiler
+run.bat
+```
+
+3. Find compilation artifacts in the `build/` directory (at the project root)
+
+## How It Works
+
+The `run.bat` script:
+- Loops through all `.sol` files in the `../contracts/` directory
+- Sets each filename as the `CONTRACT_NAME` environment variable
+- Runs Docker Compose for each file
+
+## Outputs
+
+For each contract, the compiler generates:
+- `ContractName.abi`: Contract ABI (JSON interface)
+- `ContractName.bin`: Deployable bytecode
+- `ContractName.bin-runtime`: Runtime bytecode (excluding constructor)
+
+## Example
+
+1. Create a file `MyToken.sol` in the `contracts/` directory
+2. Run `docker/run.bat`
+3. Find `MyToken.abi`, `MyToken.bin`, and `MyToken.bin-runtime` in the `build/` directory
