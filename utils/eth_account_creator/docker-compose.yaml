@@ -1,9 +1,0 @@
-services:
-  eth_account_generator:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - ./.output:/output
-    environment:
-      ACCOUNTS: node0,node1

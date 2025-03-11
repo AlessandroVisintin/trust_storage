@@ -1,93 +1,72 @@
-# Ethereum Account Generator
+# Ethereum Account Creator
 
-This Docker-based Rust program generates Ethereum accounts, including private keys, public keys, and addresses, based on provided account names. It uses the secp256k1 elliptic curve cryptography and Keccak-256 hashing to create secure and unique Ethereum accounts.
+Docker-based utility for generating Ethereum wallet accounts with their corresponding private and public keys.
 
-## Features
+## Overview
 
-- Generates multiple Ethereum accounts based on provided account names
-- Creates private keys, public keys, and Ethereum addresses
-- Outputs the generated keys and addresses to separate files
-- Organizes output files in directories named after each account
-- Runs in a Docker container for easy deployment and isolation
+This tool generates Ethereum wallet accounts using cryptographically secure random number generation, producing private keys, public keys, and Ethereum addresses. Each account's information is stored in separate files within a uniquely named directory. The application is containerized with Docker for easy deployment and cross-platform compatibility.
 
-## Requirements
+The Ethereum Account Creator leverages the secp256k1 elliptic curve cryptography, which is the same cryptographic algorithm used by the Ethereum blockchain. It produces cryptographically secure random private keys, derives the corresponding public keys, and calculates the Ethereum addresses using the Keccak-256 hashing algorithm. This process ensures that the generated accounts are compatible with all Ethereum-based applications and services.
+
+Each time you run the application, it creates a new Ethereum account with unique cryptographic keys. The keys are stored in a directory named after the last 8 characters of the Ethereum address, making it easy to identify and organize multiple accounts. This naming convention also provides a quick visual reference to distinguish between different accounts without revealing the entire address.
+
+## Prerequisites
 
 - Docker
 - Docker Compose
 
-## Input
-
-The program requires the following input:
-
-1. **ACCOUNTS** environment variable: A comma-separated list of account names for which to generate Ethereum accounts.
-
-This is set in the `docker-compose.yml` file:
-
-```yaml
-environment:
-    ACCOUNTS: node0,node1
-```
-
-## Output
-
-For each account name provided, the program generates the following files in the `./.output/<account_name>/` directory on the host machine:
-
-1. `.prv`: Contains the private key in hexadecimal format, prefixed with "0x"
-2. `.pub`: Contains the public key in hexadecimal format, prefixed with "0x"
-3. `.address`: Contains the Ethereum address in hexadecimal format, prefixed with "0x"
-
 ## Usage
 
-1. Ensure Docker and Docker Compose are installed on your system.
-2. Clone the repository containing the Dockerfile and docker-compose.yml.
-3. Modify the `ACCOUNTS` environment variable in the `docker-compose.yml` file if you want to change the account names:
+1. Clone or download this repository to your local machine
+2. Navigate to the project directory
+3. Run the account generation script:
 
-```yaml
-environment:
-    ACCOUNTS: account1,account2,account3
+```bash
+.\docker\run.bat
 ```
 
-4. Build and run the Docker container using Docker Compose:
+4. When prompted, enter the number of Ethereum accounts you want to create
+5. Find the generated accounts in the `build/` directory
 
-```sh
-docker-compose up
-```
+## How It Works
 
-5. The program will create directories for each account name under the `./.output` directory on your host machine and generate the corresponding key and address files.
+The application performs the following steps to generate each Ethereum account:
 
-## Example Output
+1. Generates a cryptographically secure random 32-byte private key
+2. Derives the public key from the private key using elliptic curve cryptography (secp256k1)
+3. Hashes the public key using Keccak-256 to obtain the Ethereum address
+4. Creates a directory named after the last 8 characters of the address
+5. Stores the private key, public key, and address in separate files within the directory
 
-After running the program with the default `ACCOUNTS="node0,node1"`, you should see the following directory structure in your project folder:
+The `run.bat` script orchestrates this process by:
+- Building the Docker image containing the Rust application
+- Asking how many accounts to generate
+- Running the Docker container the specified number of times
+- Each container execution generates one Ethereum account
 
-```sh
-.output/
-├── node0/
-│ ├── .prv
-│ ├── .pub
-│ └── .address
-└── node1/
-├── .prv
-├── .pub
-└── .address
-```
+## Outputs
 
-Each file will contain the respective key or address in hexadecimal format, prefixed with "0x".
+For each account, the following files are generated in a subdirectory of the `build/` directory:
 
-## Docker Configuration
+- `.prv`: Contains the private key in hexadecimal format (prefixed with 0x)
+- `.pub`: Contains the public key in hexadecimal format (prefixed with 0x)
+- `.address`: Contains the Ethereum address in hexadecimal format (prefixed with 0x)
 
-The application uses a multi-stage Docker build:
-
-1. The first stage uses the official Rust image to build the application.
-2. The second stage uses a minimal `distroless/cc` image to run the compiled binary.
-
-This approach results in a smaller final image and improved security by not including unnecessary components.
+The subdirectory itself is named after the last 8 characters of the Ethereum address.
 
 ## Security Considerations
 
-- The private keys generated by this program are sensitive information. Ensure that the output directory and files have appropriate access permissions.
-- For production use, consider implementing additional security measures, such as encryption of the private key files.
-- The Docker container runs as a non-root user for improved security.
+The Ethereum accounts generated by this tool are cryptographically secure and can be used for real transactions on the Ethereum network. However, please be aware of the following security considerations:
 
-## Note
+1. The private keys are stored as plain text files. Anyone with access to these files will have full control of the associated Ethereum accounts.
+2. For production use, consider implementing additional security measures such as encryption of the private keys.
+3. Back up your private keys securely if you plan to use these accounts for storing valuable assets.
 
-This program is designed for educational and testing purposes.
+## Example
+
+1. Open a command prompt or terminal and navigate to the project directory
+2. Run the batch file: `.\docker\run.bat`
+3. When prompted "How many Ethereum accounts do you want to create?", enter: `3`
+4. The script will create three Ethereum accounts, displaying progress as it goes
+5. Navigate to the `build/` directory to find three subdirectories, each named after the last 8 characters of an Ethereum address
+6. In each subdirectory, you'll find the `.prv`, `.pub`, and `.address` files containing the account's cryptographic information

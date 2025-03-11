@@ -1,5 +1,3 @@
-@REM docker-compose -f "%~dp0docker-compose.yaml" up
-
 @echo off
 setlocal enabledelayedexpansion
 
