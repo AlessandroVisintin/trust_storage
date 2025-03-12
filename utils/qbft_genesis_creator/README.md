@@ -1,64 +1,111 @@
-# QBFT Genesis Creator
+# Besu QBFT Genesis Creator  
+**Docker-based utility for generating Hyperledger Besu QBFT genesis files.**  
 
-This Docker application generates a `genesis.json` file for a Besu QBFT (Quorum Byzantine Fault Tolerance) network based on provided inputs.
+## Overview  
+This tool automates creation of QBFT consensus genesis files for Besu blockchains. It processes:  
+- **Validator addresses**  
+- **Bootnode connections**  
+- **Precompiled contracts**  
 
-## Inputs and Outputs
+Generates a complete `genesis.json` file with:  
+- Validator set in `extraData`  
+- Network bootnodes  
+- Contract allocations with balances  
 
-### Inputs
+## Prerequisites  
+- Docker  
+- Docker Compose  
 
-The application requires the following inputs:
+## Usage  
+1. Prepare input files:  
+   - `bootnodes.txt`: Enode entries (format: `0xpubkey@address`)  
+   - `validators.txt`: Ethereum addresses (one per line)  
+   - `contracts/`: Directory with contract bytecode files (`*.bin-runtime`)  
 
-1. **Validator Information**
-   - Environment Variable: `VALIDATORS` (comma-separated list of validator names)
-   - Required Files: `.address` for each validator
-   - Content: Ethereum address of the validator
-
-2. **Bootnode Information**
-   - Environment Variable: `BOOTNODES` (comma-separated list of bootnode names)
-   - Required Files: `.pub` for each bootnode
-   - Content: Public key of the bootnode
-
-3. **Contract Information**
-   - Environment Variable: `CONTRACTS` (comma-separated list of contract names)
-   - Required Files: `.bin-runtime` for each contract
-   - Content: Runtime bytecode of the contract
-
-### Outputs
-
-The application generates the following outputs in the `./output` directory:
-
-1. `genesis.json`: The main genesis file for the Besu QBFT network, which includes an `alloc` field that pre-deploys the specified contracts with their bytecode and initial balance.
-
-2. `{contract_name}.address`: A file for each contract containing its calculated address.
-
-3. `bootnodes.txt`: a text file containing a list of enode URLs for available bootnodes (one per line). Each enode URL follows the format `"enode://..pubkey..@{node name}"`, where `{node name}` serves as a placeholder for the future IP:PORT of the node.
-
-## Usage
-
-1. Prepare the input files as described above.
-2. Modify the `docker-compose.yml` file to map the files into the correct volumes:
-
-```yaml
-volumes:
-  - /path/to/node/.pub:/nodes/node/.pub
-  - ...
-  - /path/to/contract/contract.bin-runtime:/contracts/contract/contract.bin-runtime
-  - ...
+2. Run generator:  
+```bash 
+.\docker\run.bat 
 ```
 
-3. Set the required environment variables in the `docker-compose.yml` file:
+3. Find `genesis.json` in `build/` directory  
 
-```yaml
-environment:
-  BOOTNODES: node0,node1
-  VALIDATORS: validator0,validator1
-  CONTRACTS: contract0,contract1
+## File Structure  
+```bash
+data/
+├── bootnodes.txt       # Network bootstrap nodes
+├── validators.txt      # Validator addresses  
+└── contracts/          # Contract bytecode files (*.bin-runtime)
+build/
+└── genesis.json        # Generated configuration
 ```
 
-4. Run the application:
+## How It Works  
+1. **Input Processing**  
+   - Validators: Generates QBFT `extraData` header  
+   - Bootnodes: Creates enode URLs list  
+   - Contracts: Allocates addresses with balances  
 
-```sh
-docker-compose up
+2. **Address Generation**  
+Contracts receive deterministic addresses using:  
+`keccak("Rescale{{contractName}}")[0..20]`  
+
+3. **Docker Pipeline**  
+- Builds Rust executable in container  
+- Maps directories:  
+  - `/sources`: Input files  
+  - `/output`: Generated genesis.json  
+
+## Input File Formats  
+**bootnodes.txt**  
+```text
+0x{{pubkey1}}@{{nodeAddress | placeholder}}
+0x{{pubkey}}@{{nodeAddress | placeholder}}
 ```
 
-5. Retrieve the generated `genesis.json`, `bootnodes.txt` and contract address files from the output directory.
+**validators.txt**  
+```text
+0xBf0dFc0132D3D0Aaf652D42aAbC2D391862478Dc
+0x2D319DdF7F962B9ca8E70E2F2B9070bCA087c8d5
+```
+
+**contracts/**  
+```bash
+MyContract.bin-runtime  # Runtime bytecode
+```
+
+## Output  
+`genesis.json` contains:  
+- QBFT consensus parameters  
+- Pre-configured validators  
+- Network bootnodes  
+- Contract allocations with:  
+  - Max ETH balance (`0xff...ff`)  
+  - Provided bytecode  
+  - Empty storage  
+
+## Example  
+1. Add validator addresses to `validators.txt`
+1. Add bootnodes addresses to `validators.txt`  
+2. Place contract bytecode in `contracts/`  
+3. Execute `docker/run.bat`  
+4. Use generated `build/genesis.json` for network initialization  
+
+```json
+{
+  "config": {
+    "qbft": {
+      "blockperiodseconds": 5,
+      "epochlength": 30000
+    }
+  },
+  "extraData": "0x...040ec65...",
+  "bootnodes": [
+    "enode://a5...@placeholder"
+  ],
+  "alloc": {
+    "0xb6...": {
+      "code": "0x608...06003",
+      "balance": "0xffff...ffff"
+    }
+  }
+}

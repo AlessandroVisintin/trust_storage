@@ -1,129 +1,168 @@
 use ethaddr::Address;
-use hex;
-use std::fs;
-use std::io::{self, Read, Write, BufWriter};
-use std::env;
+use std::fs::{self, File};
+use std::io::{BufRead, BufReader, Read, Write};
+use std::path::Path;
 use rlp::{RlpStream};
 use serde_json::{Value, json};
 
-fn main() -> io::Result<()> {
 
-    let mut template_file = fs::File::open("/sources/template.json")?;
-    let mut template_contents = String::new();
-    template_file.read_to_string(&mut template_contents)?;
-    let mut json: Value = serde_json::from_str(&template_contents)?;
+fn main() -> Result<(), Box<dyn std::error::Error>>  {
 
-    let validators = read_validators()?;
-    let extra_data = encode_extra_data(&validators);
-    let alloc = read_contracts()?;
+    let mut json_content = read_json("/sources/template.json")?;
+    let mut json_obj = json_content.as_object_mut().ok_or("JSON is not an object")?;
 
-    json["extraData"] = json!(format!("0x{}", extra_data));
-    json["alloc"] = json!(alloc);
+    let bootnodes = read_bootnodes("/sources/bootnodes.txt");
+    let enodes: Vec<String> = bootnodes.iter()
+        .map(|(pubkey, address)| generate_enode(pubkey, address))
+        .collect();
+    json_obj["bootnodes"] = json!(enodes);
 
-    let output = serde_json::to_string_pretty(&json)?;
-    let mut output_file = fs::File::create("/output/genesis.json")?;
+    let validators = read_validators("/sources/validators.txt");
+    let extradata = generate_extradata(&validators);
+    json_obj["extraData"] = json!(format!("0x{}", extradata));
+
+    let contracts = read_contracts("/sources/contracts");
+    json_obj["alloc"] = generate_alloc(contracts);
+
+    write_json("/output/genesis.json", &json!(json_obj))?;
+    println!("genesis.json have been successfully generated");
+
+    Ok(())
+
+}
+
+fn read_json(file_location: &str) -> Result<Value, Box<dyn std::error::Error>> {
+    let mut json_file = File::open(file_location)?;
+    let mut json_content = String::new();
+    json_file.read_to_string(&mut json_content)?;
+    Ok(serde_json::from_str(&json_content)?)
+}
+
+fn write_json(file_location: &str, json_content: &Value) -> Result<(), Box<dyn std::error::Error>> {
+    let output = serde_json::to_string_pretty(&json_content)?;
+    let mut output_file = File::create(file_location)?;
     output_file.write_all(output.as_bytes())?;
-
-    let bootnodes = generate_bootnodes()?;
-    let bootnodes_file = fs::File::create("/output/bootnodes.txt")?;
-    let mut writer = BufWriter::new(bootnodes_file);
-    for bootnode in &bootnodes {
-        writeln!(writer, "{}", bootnode)?;
-    }
-
     Ok(())
 }
 
-fn generate_bootnodes() -> io::Result<Vec<String>> {
-    let bootnodes_env = env::var("BOOTNODES").unwrap_or_default();
-    if bootnodes_env.is_empty() {
-        return Ok(Vec::new());
-    }
-    let bootnode_names: Vec<&str> = bootnodes_env.split(',').map(|s| s.trim()).collect();
-    let mut bootnodes = Vec::new();
-
-    for node_name in bootnode_names {
-        let pubkey_path = format!("/nodes/{node_name}/.pub");
-        let mut file = fs::File::open(pubkey_path)?;
-        let mut pubkey = String::new();
-        file.read_to_string(&mut pubkey)?;
-
-        let clean_pubkey = pubkey.trim().strip_prefix("0x").unwrap_or(pubkey.trim());
-        let enode = format!("enode://{}@{}", clean_pubkey, node_name);
-        bootnodes.push(enode);
-    }
-
-    Ok(bootnodes)
+fn read_bootnodes(file_location: &str) -> Vec<(String, String)> {
+    let file_path = Path::new(file_location);
+    let file = File::open(file_path).expect("Failed to open bootnodes.txt");
+    let reader = BufReader::new(file);
+    reader.lines()
+        .filter_map(|line| {
+            let line = line.expect("Error reading line").trim().to_string();
+            if line.is_empty() {
+                return None;
+            }
+            let mut parts = line.split('@');
+            match (parts.next(), parts.next(), parts.next()) {
+                (Some(pubkey), Some(address), None) => {
+                    let clean_pubkey = pubkey.trim()
+                        .strip_prefix("0x")
+                        .unwrap_or(pubkey.trim())
+                        .to_string();
+                    let clean_address = address.trim().to_string();
+                    Some((clean_pubkey, clean_address))
+                }
+                _ => {
+                    eprintln!("Invalid format in bootnode entry: {}", line);
+                    None
+                }
+            }
+        })
+        .collect()
 }
 
-fn to_checksum_address(address: &str) -> Result<String, String> {
+fn read_validators(file_location: &str) -> Vec<String> {
+    let file_path = Path::new(file_location);
+    let file = File::open(file_path).expect("Failed to open validators.txt");
+    let reader = BufReader::new(file);
+    reader.lines()
+        .map(|line| {
+            line.expect("Error reading line")
+                .trim()
+                .strip_prefix("0x")
+                .unwrap_or_default()
+                .to_string()
+        })
+        .filter(|s| !s.is_empty())
+        .collect()
+}
+
+fn read_contracts(folder_location: &str) -> Vec<(String, String)> {
+    let contracts_dir = Path::new(folder_location);
+    fs::read_dir(contracts_dir)
+        .map(|entries| {
+            entries
+                .filter_map(Result::ok)
+                .filter(|entry| entry.path().extension().and_then(|s| s.to_str()) == Some("bin-runtime"))
+                .filter_map(|entry| {
+                    let path = entry.path();
+                    let file_name = path.file_stem()?.to_str()?.to_string();
+                    let mut content = String::new();
+                    fs::File::open(&path).ok()?.read_to_string(&mut content).ok()?;
+                    Some((file_name, content.trim().to_string()))
+                })
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+fn generate_enode(node_pubkey: &str, node_address: &str) -> String {
+    format!(
+        "enode://{}@{}",
+        node_pubkey.trim().strip_prefix("0x").unwrap_or(node_pubkey.trim()),
+        node_address
+    )
+}
+
+fn generate_extradata(validators: &[String]) -> String {
+    let mut rlp = RlpStream::new_list(5);
+    rlp.append(&vec![0u8; 32]); // Vanity data (32 bytes)
+    rlp.begin_list( validators.len() ); // Validators
+    for validator in validators {
+        let address = validator.strip_prefix("0x").unwrap_or(validator);
+        let decoded = hex::decode(address).expect("Invalid hexadecimal address");
+        assert_eq!(decoded.len(), 20, "Validator address must be 20 bytes");
+        rlp.append(&decoded);
+    }
+    //rlp.append_raw(&[0xc0], 1); // No vote (empty list)
+    rlp.append_empty_data();
+    //rlp.append(&0u8); // Round number (0)
+    rlp.append(&0u64);
+    //rlp.append_raw(&[0xc0], 1); // Seals (empty list)
+    rlp.append_empty_data();
+    hex::encode( rlp.out() )
+}
+
+fn to_checksum_address(address: &str) -> String {
     let address = address.strip_prefix("0x").unwrap_or(address);
-    let bytes = hex::decode(address).map_err(|e| format!("Invalid hex string: {}", e))?;
-    if bytes.len() != 20 {
-        return Err(format!("Invalid address length: expected 20 bytes, got {}", bytes.len()));
-    }
-    let address = Address::from_slice(&bytes);
-    Ok(address.to_string())
+    let bytes = hex::decode(address).expect("Invalid hex string");
+    assert_eq!(bytes.len(), 20, "Invalid address length");
+    Address::from_slice(&bytes).to_string()
 }
 
-fn calculate_contract_address(contract_name: &str) -> io::Result<String> {
+fn calculate_contract_address(contract_name: &str) -> String {
     let address_hex = hex::encode(format!("Rescale{}", contract_name));
     let contract_address = if address_hex.len() >= 40 {
         address_hex[..40].to_string()
     } else {
         format!("{:0>40}", address_hex)
     };
-    to_checksum_address(&format!("0x{}", contract_address)).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
+    to_checksum_address(&format!("0x{}", contract_address))
 }
 
-fn read_contracts() -> io::Result<Value> {
-    let contracts_env = env::var("CONTRACTS").expect("CONTRACTS environment variable not set");
-    let contract_names: Vec<&str> = contracts_env.split(',').map(|s| s.trim()).collect();
+fn generate_alloc(contracts: Vec<(String, String)>) -> Value {
     let mut alloc = json!({});
-    for contract_name in contract_names {
-        let address = calculate_contract_address(contract_name)?;
-        let address_file_path = format!("/output/{}.address", contract_name);
-        fs::write(&address_file_path, &address)?;
-        
-        let bin_runtime_path = format!("/contracts/{}.bin-runtime", contract_name);
-        let mut file = fs::File::open(bin_runtime_path)?;
-        let mut contents = String::new();
-        file.read_to_string(&mut contents)?;
-        
-        let value = serde_json::json!({
+    for (contract_name, bytecode) in contracts {
+        let address = calculate_contract_address(&contract_name);
+        let contract_data = json!({
             "balance": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-            "code": contents.trim(),
+            "code": bytecode.trim(),
             "storage": {}
         });
-        alloc[address] = value;
+        alloc[address] = contract_data;
     }
-    Ok(alloc)
-}
-
-fn read_validators() -> io::Result<Vec<String>> {
-    let validators_env = env::var("VALIDATORS").expect("VALIDATORS environment variable not set");
-    let validator_names: Vec<&str> = validators_env.split(',').map(|s| s.trim()).collect();
-    let mut validators = Vec::new();
-    for validator in validator_names {
-        let address_path = format!("/nodes/{validator}/.address");
-        let mut file = fs::File::open(address_path)?;
-        let mut contents = String::new();
-        file.read_to_string(&mut contents)?;
-        validators.push(contents.trim().to_string());
-    }
-    Ok(validators)
-}
-
-fn encode_extra_data(validators: &[String]) -> String {
-    let mut rlp = RlpStream::new_list(5);
-    rlp.append(&vec![0u8; 32]); // Vanity data (32 bytes)
-    rlp.begin_list(validators.len()); // Validators
-    for validator in validators {
-        let address = hex::decode(&validator[2..]).unwrap();
-        rlp.append(&address);
-    }
-    rlp.append_raw(&[0xc0], 1); // No vote (empty list)
-    rlp.append(&0u8); // Round number (0)
-    rlp.append_raw(&[0xc0], 1); // Seals (empty list)
-    hex::encode(rlp.out().as_ref())
+    alloc
 }
