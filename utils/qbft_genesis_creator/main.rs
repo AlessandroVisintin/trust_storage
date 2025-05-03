@@ -127,13 +127,13 @@ fn generate_extradata(validators: &[String]) -> String {
         assert_eq!(decoded.len(), 20, "Validator address must be 20 bytes");
         rlp.append(&decoded);
     }
-    //rlp.append_raw(&[0xc0], 1); // No vote (empty list)
-    rlp.append_empty_data();
-    //rlp.append(&0u8); // Round number (0)
-    rlp.append(&0u64);
-    //rlp.append_raw(&[0xc0], 1); // Seals (empty list)
-    rlp.append_empty_data();
-    hex::encode( rlp.out() )
+    rlp.append_raw(&[0xc0], 1); // No vote (empty list)
+    //rlp.append_empty_data();
+    rlp.append(&0u8); // Round number (0)
+    //rlp.append(&0u64);
+    rlp.append_raw(&[0xc0], 1); // Seals (empty list)
+    //rlp.append_empty_data();
+    hex::encode( rlp.out().as_ref() )
 }
 
 fn to_checksum_address(address: &str) -> String {

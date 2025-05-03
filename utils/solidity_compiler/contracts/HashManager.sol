@@ -30,17 +30,6 @@ contract HashManager {
         return (hashInfo.index, hashInfo.owner);
     }
 
-    // function updateHash(bytes32 _oldHash, bytes32 _newHash) external { // update
-    //     require(hashMapping[_oldHash].owner != address(0), "Old hash does not exist");
-    //     require(hashMapping[_newHash].owner == address(0), "New hash already exists");
-    //     require(hashMapping[_oldHash].owner == msg.sender, "Caller is not the owner");
-    //     uint256 index = hashMapping[_oldHash].index; // Get the index of the old hash
-    //     hashList[index] = _newHash; // Replace old hash in array with the new hash
-    //     hashMapping[_newHash] = HashInfo({ index: index, owner: msg.sender }); // Add new hash in mapping
-    //     delete hashMapping[_oldHash]; // Delete old hash from mapping
-    //     emit HashUpdated(_oldHash, _newHash, msg.sender); // emit event
-    // }
-
     function deprecate(bytes32 _hash) external {
         require(hashMapping[_hash].owner != address(0), "Hash does not exist");
         require(hashMapping[_hash].owner == msg.sender, "Caller is not the owner");

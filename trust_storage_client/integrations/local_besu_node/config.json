@@ -1,0 +1,7 @@
+{
+    "endpoint": "http://localhost:8545",
+    "contract_address_file": "data/HashManager.address",
+    "contract_abi_file": "data/HashManager.abi",
+    "private_key_file": "data/key.prv",
+    "public_key_file": "data/key.pub"
+}

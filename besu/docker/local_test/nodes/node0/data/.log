@@ -1,0 +1,88 @@
+2025-05-01 04:37:49.719+00:00 | main | INFO  | Besu | Starting Besu
+2025-05-01 04:37:49.984+00:00 | main | WARN  | Besu | --rpc-ws-host has been ignored because --rpc-ws-enabled was not defined on the command line.
+2025-05-01 04:37:49.990+00:00 | main | WARN  | Besu | --graphql-http-host has been ignored because --graphql-http-enabled was not defined on the command line.
+2025-05-01 04:37:50.142+00:00 | main | WARN  | Besu | Forcing --bonsai-limit-trie-logs-enabled=false, since it cannot be enabled with --sync-mode=FULL and --data-storage-format=BONSAI.
+2025-05-01 04:37:50.144+00:00 | main | INFO  | Besu | Connecting to 0 static nodes.
+2025-05-01 04:37:50.151+00:00 | main | WARN  | Besu | Forcing price bump for transaction replacement to 0, since we are on a zero basefee network
+2025-05-01 04:37:50.153+00:00 | main | WARN  | Besu | Forcing price bump for transaction replacement to 0, since min-gas-price is set to 0
+2025-05-01 04:37:50.154+00:00 | main | WARN  | Besu | Forcing tx-pool-min-gas-price=0, since it cannot be greater than the value of min-gas-price
+2025-05-01 04:37:50.266+00:00 | main | INFO  | Besu | 
+####################################################################################################
+#                                                                                                  #
+# Besu version 24.9.1                                                                              #
+#                                                                                                  #
+# Configuration:                                                                                   #
+# Network: Custom genesis file                                                                     #
+# /sources/network/genesis.json                                                                    #
+# Network Id: 1337                                                                                 #
+# Data storage: Bonsai                                                                             #
+# Sync mode: Full                                                                                  #
+# RPC HTTP APIs: ETH,NET,QBFT                                                                      #
+# RPC HTTP port: 8545                                                                              #
+# Using LAYERED transaction pool implementation                                                    #
+# Using STACKED worldstate update mode                                                             #
+#                                                                                                  #
+# Host:                                                                                            #
+# Java: openjdk-java-21                                                                            #
+# Maximum heap size: 0.94 GB                                                                       #
+# OS: linux-x86_64                                                                                 #
+# glibc: 2.39                                                                                      #
+# jemalloc: 5.3.0-0-g54eaed1d8b56b1aa528be3bdd1877e59c56fa90c                                      #
+# Total memory: 3.76 GB                                                                            #
+# CPU cores: 12                                                                                    #
+#                                                                                                  #
+# Plugin Registration Summary:                                                                     #
+# No plugins have been registered.                                                                 #
+# TOTAL = 0 of 0 plugins successfully registered.                                                  #
+#                                                                                                  #
+####################################################################################################
+2025-05-01 04:37:50.267+00:00 | main | INFO  | Besu | Security Module: localfile
+2025-05-01 04:37:50.268+00:00 | main | INFO  | VersionMetadata | Lookup version metadata file in data directory: /sources/account/data
+2025-05-01 04:37:50.300+00:00 | main | INFO  | VersionMetadata | Existing version data detected. Besu version 24.9.1
+2025-05-01 04:37:50.338+00:00 | main | INFO  | Besu | Using the native implementation of alt bn128
+2025-05-01 04:37:50.386+00:00 | main | INFO  | Besu | Using the native implementation of modexp
+2025-05-01 04:37:50.388+00:00 | main | INFO  | Besu | Using the native implementation of the signature algorithm
+2025-05-01 04:37:50.391+00:00 | main | INFO  | Besu | Using the native implementation of the blake2bf algorithm
+2025-05-01 04:37:50.402+00:00 | main | INFO  | KZGPointEvalPrecompiledContract | Loading network trusted setup from classpath resource /kzg-trusted-setups/mainnet.txt
+2025-05-01 04:37:50.568+00:00 | main | WARN  | Besu | Forcing price bump for transaction replacement to 0, since we are on a zero basefee network
+2025-05-01 04:37:50.569+00:00 | main | WARN  | Besu | Forcing price bump for transaction replacement to 0, since min-gas-price is set to 0
+2025-05-01 04:37:50.570+00:00 | main | WARN  | Besu | Forcing tx-pool-min-gas-price=0, since it cannot be greater than the value of min-gas-price
+2025-05-01 04:37:50.573+00:00 | main | INFO  | KeyPairUtil | Attempting to load public key from /sources/account/.prv
+2025-05-01 04:37:50.606+00:00 | main | INFO  | KeyPairUtil | Loaded public key 0x55b145bbc229d45277d31259c88f3538dfb369eeb74f6e06be059a7321acc9ca70cbcda570462f6e1cf38804bc12b0e83631e96f8cb7b2ebcfdd73d566cbbcec from /sources/account/.prv
+2025-05-01 04:37:50.764+00:00 | main | INFO  | ProtocolScheduleBuilder | Protocol schedule created with milestones: [Cancun:0]
+2025-05-01 04:37:50.771+00:00 | main | INFO  | DatabaseMetadata | Lookup database metadata file in data directory: /sources/account/data
+2025-05-01 04:37:50.799+00:00 | main | INFO  | RocksDBKeyValueStorageFactory | Existing database at /sources/account/data. Metadata versionedStorageFormat=BaseVersionedStorageFormat{format=BONSAI, version=3}. Processing WAL...
+2025-05-01 04:37:51.154+00:00 | main | INFO  | FlatDbStrategyProvider | Bonsai flat db mode found FULL
+2025-05-01 04:37:51.160+00:00 | main | INFO  | FlatDbStrategyProvider | Bonsai db mode with code stored using code hash enabled = true
+2025-05-01 04:37:51.180+00:00 | main | INFO  | FlatDbStrategyProvider | Bonsai flat db mode found FULL
+2025-05-01 04:37:51.182+00:00 | main | INFO  | FlatDbStrategyProvider | Bonsai db mode with code stored using code hash enabled = true
+2025-05-01 04:37:51.267+00:00 | main | INFO  | TransactionPoolFactory | Enabling transaction pool
+2025-05-01 04:37:51.279+00:00 | main | INFO  | BesuControllerBuilder | QBFT is configured, creating initial sync for BFT
+2025-05-01 04:37:51.282+00:00 | main | INFO  | BFTPivotSelectorFromPeers | Creating pivot block selector for BFT node
+2025-05-01 04:37:51.316+00:00 | main | INFO  | RunnerBuilder | Resolved 1 bootnodes.
+2025-05-01 04:37:51.326+00:00 | main | INFO  | RunnerBuilder | Detecting NAT service.
+2025-05-01 04:37:51.455+00:00 | main | INFO  | Runner | Starting external services ... 
+2025-05-01 04:37:51.456+00:00 | main | INFO  | JsonRpcHttpService | Starting JSON-RPC service on 0.0.0.0:8545
+2025-05-01 04:37:51.604+00:00 | vert.x-eventloop-thread-1 | INFO  | JsonRpcHttpService | JSON-RPC service started and listening on 0.0.0.0:8545
+2025-05-01 04:37:51.609+00:00 | main | INFO  | AutoTransactionLogBloomCachingService | Starting auto transaction log bloom caching service.
+2025-05-01 04:37:51.613+00:00 | main | INFO  | LogBloomCacheMetadata | Lookup cache metadata file in data directory: /sources/account/data/caches
+2025-05-01 04:37:51.625+00:00 | main | INFO  | Runner | Starting Ethereum main loop ... 
+2025-05-01 04:37:51.626+00:00 | main | INFO  | DockerNatManager | Starting docker NAT manager.
+2025-05-01 04:37:59.633+00:00 | main | INFO  | NetworkRunner | Starting Network.
+2025-05-01 04:37:59.643+00:00 | nioEventLoopGroup-2-1 | INFO  | RlpxAgent | P2P RLPx agent started and listening on /[0:0:0:0:0:0:0:0]:30303.
+2025-05-01 04:37:59.644+00:00 | main | INFO  | PeerDiscoveryAgent | Starting peer discovery agent on host=0.0.0.0, port=30303. IPv6 available.
+2025-05-01 04:37:59.652+00:00 | vert.x-eventloop-thread-1 | INFO  | VertxPeerDiscoveryAgent | Started peer discovery agent successfully, on effective host=0:0:0:0:0:0:0:0 and port=30303
+2025-05-01 04:37:59.653+00:00 | vert.x-eventloop-thread-1 | INFO  | PeerDiscoveryAgent | P2P peer discovery agent started and listening on /[0:0:0:0:0:0:0:0]:30303
+2025-05-01 04:37:59.680+00:00 | vert.x-eventloop-thread-1 | INFO  | PeerDiscoveryAgent | Writing node record to disk. NodeRecord{seq=18, publicKey=0x0255b145bbc229d45277d31259c88f3538dfb369eeb74f6e06be059a7321acc9ca, udpAddress=Optional[/0.0.0.0:30303], tcpAddress=Optional[/0.0.0.0:30303], udp6Address=Optional.empty, tcp6Address=Optional.empty, asBase64=-Je4QBxSo9SS4kquedh62Dj7yrXMyqMFlb6-m85ZMsZ90FrYU6peCmSnSMlWVjRW2t7rm1qJfoj-GFaxT4uNQd85i8gSg2V0aMfGhFCx_x2AgmlkgnY0gmlwhAAAAACJc2VjcDI1NmsxoQJVsUW7winUUnfTElnIjzU437Np7rdPbga-BZpzIazJyoN0Y3CCdl-DdWRwgnZf, nodeId=0xdeb8c6f5513ea8ce72a4cf8bb4c3770e71aabb09f2da7e081201377a72cc83d1, customFields={tcp=30303, udp=30303, ip=0x00000000, eth=[[0x50b1ff1d, 0x]], id=V4, secp256k1=0x0255b145bbc229d45277d31259c88f3538dfb369eeb74f6e06be059a7321acc9ca}}
+2025-05-01 04:37:59.697+00:00 | main | INFO  | DefaultP2PNetwork | Enode URL enode://55b145bbc229d45277d31259c88f3538dfb369eeb74f6e06be059a7321acc9ca70cbcda570462f6e1cf38804bc12b0e83631e96f8cb7b2ebcfdd73d566cbbcec@0.0.0.0:30303
+2025-05-01 04:37:59.698+00:00 | main | INFO  | DefaultP2PNetwork | Node address 0xb4c3770e71aabb09f2da7e081201377a72cc83d1
+2025-05-01 04:37:59.705+00:00 | main | INFO  | NetworkRunner | Supported capabilities: [eth/62, eth/63, eth/64, eth/65, eth/66, eth/67, eth/68], [istanbul/100], [snap/1]
+2025-05-01 04:37:59.705+00:00 | main | INFO  | DefaultSynchronizer | Starting synchronizer.
+2025-05-01 04:37:59.707+00:00 | main | INFO  | TransactionPoolFactory | Enabling transaction handling following initial sync
+2025-05-01 04:37:59.708+00:00 | main | INFO  | QbftBesuControllerBuilder | Starting QBFT mining coordinator following initial sync
+2025-05-01 04:38:00.210+00:00 | main | INFO  | FullSyncDownloader | Starting full sync.
+2025-05-01 04:38:00.211+00:00 | main | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2025-05-01 04:38:00.219+00:00 | main | INFO  | Runner | Ethereum main loop is up.
+2025-05-01 04:38:00.285+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Produced #2,833 / 0 tx / 0 pending / 0 (0.0%) gas / (0xcfdc7d606f64354cd765eda0cc0deaca3ec2b2093b1a3f3a68da19e8269ac52e)
+2025-05-01 04:38:05.226+00:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2025-05-01 04:38:10.228+00:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness

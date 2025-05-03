@@ -1,4 +1,2 @@
-.*
-!.gitignore
-!.env
-genesis.json
+.old/
+.pytest_cache/

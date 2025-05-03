@@ -1,0 +1,11 @@
+services:
+  besu_node:
+    build:
+      context: ..
+      dockerfile: ./Dockerfile
+    image: besu_local_test
+    ports:
+      - 127.0.0.1:8545:8545
+    volumes:
+      - ./network:/sources/network
+      - ./nodes/node0:/sources/account
