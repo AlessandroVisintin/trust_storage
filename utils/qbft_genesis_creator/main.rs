@@ -8,7 +8,7 @@ use serde_json::{Value, json};
 
 fn main() -> Result<(), Box<dyn std::error::Error>>  {
 
-    let mut json_content = read_json("/sources/template.json")?;
+    let mut json_content = read_json("/template.json")?;
     let mut json_obj = json_content.as_object_mut().ok_or("JSON is not an object")?;
 
     let bootnodes = read_bootnodes("/sources/bootnodes.txt");

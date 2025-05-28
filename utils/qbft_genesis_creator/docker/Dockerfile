@@ -13,4 +13,5 @@ RUN cargo build --release
 FROM gcr.io/distroless/cc
 WORKDIR /src
 COPY --from=builder /usr/src/app/besu_qbft_genesis_creator/target/release/besu_qbft_genesis_creator ./
+COPY template.json /template.json
 CMD ["/src/besu_qbft_genesis_creator"]

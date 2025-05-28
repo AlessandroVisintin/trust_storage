@@ -140,6 +140,6 @@ mkdir -p "../build"
 
 docker compose build
 
-docker compose run --rm qbft_genesis_creator
+docker compose run --rm --remove-orphans qbft_genesis_creator
 
 echo "Script completed successfully!"
