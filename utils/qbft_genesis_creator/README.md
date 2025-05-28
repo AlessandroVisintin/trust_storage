@@ -10,7 +10,6 @@ This tool creates production-ready genesis.json files for Ethereum networks usin
 - Contract bytecode files (*.bin-runtime format)
 - Validator node directories containing `.address` files  
 - Bootnode directories containing `.pub` files
-- Rust toolchain (optional, for local development)
 - Template configuration file (`template.json`)
 
 ## Usage
