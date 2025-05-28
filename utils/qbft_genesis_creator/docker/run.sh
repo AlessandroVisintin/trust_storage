@@ -52,28 +52,6 @@ while [[ $# -gt 0 ]]; do
             read_config_file "$2"
             shift 2
             ;;
-        --contracts)
-            contracts="$2"
-            shift 2
-            ;;
-        --bootnodes)
-            bootnodes="$2"
-            shift 2
-            ;;
-        --validators)
-            validators="$2"
-            shift 2
-            ;;
-        -h|--help)
-            echo "Usage: $0 --contracts 'path1,path2' --bootnodes 'node1,node2' --validators 'val1,val2'"
-            echo ""
-            echo "Options:"
-            echo "  --contracts   Comma-separated list of contract paths (reads .bin-runtime files)"
-            echo "  --bootnodes   Comma-separated list of node paths (reads .address files)"
-            echo "  --validators  Comma-separated list of node paths (reads .pub files)"
-            echo "  -h, --help    Show this help message"
-            exit 0
-            ;;
         *)
             echo "Unknown parameter: $1"
             echo "Use --help for usage information"
@@ -110,7 +88,7 @@ if [[ -n "$validators" ]]; then
         address_file="$node_path/.address"
         if [[ -f "$address_file" ]]; then
             echo "  Reading address from: $address_file"
-            cat "$address_file" >> ../data/validators.txt
+            echo "$(cat "$address_file")" >> ../data/validators.txt
         else
             echo "  Warning: Address file not found: $address_file"
         fi
