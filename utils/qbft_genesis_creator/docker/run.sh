@@ -93,10 +93,10 @@ if [[ -n "$contracts" ]]; then
     done
 fi
 
-# Handle bootnodes parameter (store .address content in validators.txt)
+# Handle bootnodes parameter
 if [[ -n "$bootnodes" ]]; then
     echo "Processing bootnodes..."
-    > ../data/validators.txt  # Clear the file
+    > ../data/bootnodes.txt  # Clear the file
     IFS=',' read -ra BOOTNODE_ARRAY <<< "$bootnodes"
     for node_path in "${BOOTNODE_ARRAY[@]}"; do
         # Remove leading/trailing whitespace
@@ -104,7 +104,7 @@ if [[ -n "$bootnodes" ]]; then
         address_file="$node_path/.address"
         if [[ -f "$address_file" ]]; then
             echo "  Reading address from: $address_file"
-            cat "$address_file" >> ../data/validators.txt
+            cat "$address_file" >> ../data/bootnodes.txt
         else
             echo "  Warning: Address file not found: $address_file"
         fi
@@ -114,7 +114,7 @@ fi
 # Handle validators parameter
 if [[ -n "$validators" ]]; then
     echo "Processing validators..."
-    > ../data/bootnodes.txt  # Clear the file
+    > ../data/validators.txt  # Clear the file
     IFS=',' read -ra VALIDATOR_ARRAY <<< "$validators"
     for node_path in "${VALIDATOR_ARRAY[@]}"; do
         # Remove leading/trailing whitespace
@@ -123,14 +123,14 @@ if [[ -n "$validators" ]]; then
         if [[ -f "$pubkey_file" ]]; then
             echo "  Reading pubkey from: $pubkey_file"
             pubkey_content=$(cat "$pubkey_file")
-            echo "${pubkey_content}@placeholder" >> ../data/bootnodes.txt
+            echo "${pubkey_content}@placeholder" >> ../data/validators.txt
         else
             echo "  Warning: Pubkey file not found: $pubkey_file"
         fi
     done
 fi
 
-mkdir -p "$folder/../build"
+mkdir -p "../build"
 
 docker compose build
 
