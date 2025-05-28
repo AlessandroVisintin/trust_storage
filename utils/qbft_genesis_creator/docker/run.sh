@@ -70,7 +70,7 @@ while [[ $# -gt 0 ]]; do
             echo "Options:"
             echo "  --contracts   Comma-separated list of contract paths (reads .bin-runtime files)"
             echo "  --bootnodes   Comma-separated list of node paths (reads .address files)"
-            echo "  --validators  Comma-separated list of node paths (reads .pubkey files)"
+            echo "  --validators  Comma-separated list of node paths (reads .pub files)"
             echo "  -h, --help    Show this help message"
             exit 0
             ;;
@@ -99,24 +99,6 @@ if [[ -n "$contracts" ]]; then
     done
 fi
 
-# Handle bootnodes parameter
-if [[ -n "$bootnodes" ]]; then
-    echo "Processing bootnodes..."
-    > ../data/bootnodes.txt  # Clear the file
-    IFS=',' read -ra BOOTNODE_ARRAY <<< "$bootnodes"
-    for node_path in "${BOOTNODE_ARRAY[@]}"; do
-        # Remove leading/trailing whitespace
-        node_path=$(echo "$node_path" | xargs)
-        address_file="$node_path/.address"
-        if [[ -f "$address_file" ]]; then
-            echo "  Reading address from: $address_file"
-            cat "$address_file" >> ../data/bootnodes.txt
-        else
-            echo "  Warning: Address file not found: $address_file"
-        fi
-    done
-fi
-
 # Handle validators parameter
 if [[ -n "$validators" ]]; then
     echo "Processing validators..."
@@ -125,11 +107,29 @@ if [[ -n "$validators" ]]; then
     for node_path in "${VALIDATOR_ARRAY[@]}"; do
         # Remove leading/trailing whitespace
         node_path=$(echo "$node_path" | xargs)
+        address_file="$node_path/.address"
+        if [[ -f "$address_file" ]]; then
+            echo "  Reading address from: $address_file"
+            cat "$address_file" >> ../data/validators.txt
+        else
+            echo "  Warning: Address file not found: $address_file"
+        fi
+    done
+fi
+
+# Handle bootnodes parameter
+if [[ -n "$bootnodes" ]]; then
+    echo "Processing bootnodes..."
+    > ../data/bootnodes.txt  # Clear the file
+    IFS=',' read -ra BOOTNODE_ARRAY <<< "$bootnodes"
+    for node_path in "${BOOTNODE_ARRAY[@]}"; do
+        # Remove leading/trailing whitespace
+        node_path=$(echo "$node_path" | xargs)
         pubkey_file="$node_path/.pub"
         if [[ -f "$pubkey_file" ]]; then
             echo "  Reading pubkey from: $pubkey_file"
             pubkey_content=$(cat "$pubkey_file")
-            echo "${pubkey_content}@placeholder" >> ../data/validators.txt
+            echo "${pubkey_content}@placeholder" >> ../data/bootnodes.txt
         else
             echo "  Warning: Pubkey file not found: $pubkey_file"
         fi
