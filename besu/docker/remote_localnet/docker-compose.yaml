@@ -1,0 +1,53 @@
+version: "3.8"  
+services:  
+  besu-node1:  
+    build:  
+      context: ..  
+      dockerfile: ./Dockerfile  
+    image: besu-permissioned  
+    ports:  
+      - "127.0.0.1:30303:30303"  
+      - "8545:8545"
+    volumes:  
+      - ./network:/sources/network  
+      - ./nodes/node1:/sources/account  
+    networks:  
+      besu-net:  
+        ipv4_address: 172.20.0.10  
+
+  # besu-node2:  
+  #   build:  
+  #     context: ..  
+  #     dockerfile: ./Dockerfile  
+  #   image: besu-permissioned  
+  #   ports:  
+  #     - "127.0.0.1:30304:30303"  
+  #     - "8546:8545"  
+  #   volumes:  
+  #     - ./network:/sources/network  
+  #     - ./nodes/node2:/sources/account  
+  #   networks:  
+  #     besu-net:  
+  #       ipv4_address: 172.20.0.11  
+
+  # besu-node3:  
+  #   build:  
+  #     context: ..  
+  #     dockerfile: ./Dockerfile  
+  #   image: besu-permissioned  
+  #   ports:  
+  #     - "127.0.0.1:30305:30303"  
+  #     - "8547:8545"  
+  #   volumes:  
+  #     - ./network:/sources/network  
+  #     - ./nodes/node3:/sources/account  
+  #   networks:  
+  #     besu-net:  
+  #       ipv4_address: 172.20.0.12
+
+networks:  
+  besu-net:  
+    driver: bridge  
+    ipam:  
+      config:  
+        - subnet: 172.20.0.0/24  
