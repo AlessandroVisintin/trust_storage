@@ -1,23 +1,38 @@
 #!/bin/bash
 
-#SCRIPT_DIR="$(dirname "$0")"
-#mkdir -p "$SCRIPT_DIR/../build"
+folder="$(cd "$(dirname "$0")" && pwd)"
+if [ ! -f "$folder/docker-compose.yaml" ]; then
+    echo "Error: docker-compose.yaml not found in script directory."
+    exit 1
+fi
 
-# for sol_file in $SCRIPT_DIR/contracts/*.sol; do
-#     if [ ! -f "$sol_file" ]; then
-#         echo "No .sol files found in ../contracts/"
-#         exit 1
-#     fi
-    
-#     filename=$(basename "$sol_file")
-#     echo "Compiling $filename..."
-    
-#     CONTRACT_NAME="$filename" docker compose run --rm solc
-    
-#     if [ $? -eq 0 ]; then
-#         echo "Successfully compiled $filename"
-#     else
-#         echo "Error compiling $filename"
-#     fi
+mkdir -p "$folder/../build"
 
-# done
+echo "Searching for .sol files in $folder"
+echo
+
+for file in "$folder"/../contracts/*.sol; do
+
+    if [ ! -f "$file" ]; then
+        continue
+    fi
+    
+    filename=$(basename "$file" .sol)
+    CONTRACT_NAME="$filename"
+    
+    echo "Processing contract: $filename.sol"
+    echo
+    
+    docker-compose -f "$folder/docker-compose.yaml" up
+    
+    echo
+    if [ $? -eq 0 ]; then
+        echo "Successfully processed $filename.sol"
+    else
+        echo "Error: Docker Compose failed for $filename.sol"
+    fi
+    echo
+done
+
+echo
+echo "Search completed."
