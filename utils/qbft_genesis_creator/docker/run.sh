@@ -2,6 +2,35 @@
 
 set -e
 
+read_config_file() {
+    local config_file="$1"
+    if [[ ! -f "$config_file" ]]; then
+        echo "Error: Configuration file '$config_file' not found"
+        exit 1
+    fi
+    
+    echo "Reading configuration from: $config_file"
+    
+    while IFS='=' read -r key value; do
+        # Skip empty lines and comments
+        [[ -z "$key" || "$key" =~ ^[[:space:]]*# ]] && continue        
+        # Remove leading/trailing whitespace
+        key=$(echo "$key" | xargs)
+        value=$(echo "$value" | xargs)
+        case "$key" in
+            contracts)
+                contracts="$value"
+                ;;
+            bootnodes)
+                bootnodes="$value"
+                ;;
+            validators)
+                validators="$value"
+                ;;
+        esac
+    done < "$config_file"
+}
+
 cd "$(dirname "$0")"
 
 mkdir -p ../data
@@ -13,6 +42,10 @@ validators=""
 
 while [[ $# -gt 0 ]]; do
     case $1 in
+        --config)
+            read_config_file "$2"
+            shift 2
+            ;;
         --contracts)
             contracts="$2"
             shift 2
@@ -86,15 +119,21 @@ if [[ -n "$validators" ]]; then
     for node_path in "${VALIDATOR_ARRAY[@]}"; do
         # Remove leading/trailing whitespace
         node_path=$(echo "$node_path" | xargs)
-        pubkey_file="$node_path/.pubkey"
+        pubkey_file="$node_path/.pub"
         if [[ -f "$pubkey_file" ]]; then
             echo "  Reading pubkey from: $pubkey_file"
             pubkey_content=$(cat "$pubkey_file")
-            echo "0x${pubkey_content}@placeholder" >> ../data/bootnodes.txt
+            echo "${pubkey_content}@placeholder" >> ../data/bootnodes.txt
         else
             echo "  Warning: Pubkey file not found: $pubkey_file"
         fi
     done
 fi
+
+mkdir -p "$folder/../build"
+
+docker compose build
+
+docker compose run --rm qbft_genesis_creator
 
 echo "Script completed successfully!"
