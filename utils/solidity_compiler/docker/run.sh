@@ -18,12 +18,11 @@ for file in "$folder"/../contracts/*.sol; do
     fi
     
     filename=$(basename "$file" .sol)
-    CONTRACT_NAME="$filename"
     
     echo "Processing contract: $filename.sol"
     echo
     
-    docker-compose -f "$folder/docker-compose.yaml" up
+    CONTRACT_NAME="$filename" docker compose -f "$folder/docker-compose.yaml" up
     
     echo
     if [ $? -eq 0 ]; then
