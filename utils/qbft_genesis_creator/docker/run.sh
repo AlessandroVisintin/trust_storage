@@ -11,25 +11,31 @@ read_config_file() {
     
     echo "Reading configuration from: $config_file"
     
-    while IFS='=' read -r key value; do
+    while IFS= read -r line || [[ -n "$line" ]]; do
         # Skip empty lines and comments
-        [[ -z "$key" || "$key" =~ ^[[:space:]]*# ]] && continue        
-        # Remove leading/trailing whitespace
-        key=$(echo "$key" | xargs)
-        value=$(echo "$value" | xargs)
-        case "$key" in
-            contracts)
-                contracts="$value"
-                ;;
-            bootnodes)
-                bootnodes="$value"
-                ;;
-            validators)
-                validators="$value"
-                ;;
-        esac
+        [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue    
+        # Check if line contains =
+        if [[ "$line" == *"="* ]]; then
+            key="${line%%=*}"
+            value="${line#*=}"
+            # Remove leading/trailing whitespace
+            key=$(echo "$key" | xargs)
+            value=$(echo "$value" | xargs)
+            case "$key" in
+                contracts)
+                    contracts="$value"
+                    ;;
+                bootnodes)
+                    bootnodes="$value"
+                    ;;
+                validators)
+                    validators="$value"
+                    ;;
+            esac
+        fi
     done < "$config_file"
 }
+
 
 cd "$(dirname "$0")"
 
