@@ -1,0 +1,7 @@
+services:
+
+  besu-20250531:
+    build:
+      context: .
+      dockerfile: ./docker/besu-20250531/Dockerfile
+    image: harbor.rescale-project.eu/rescale-all/besu:2025-05-31

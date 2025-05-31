@@ -1,0 +1,12 @@
+services:
+
+  localnode-1:
+    image: harbor.rescale-project.eu/rescale-all/besu:2025-05-31
+    volumes:
+      - .:/sources/account/private.key"
+      - .:/sources/network/genesis.json"
+      - .:/sources/network/bootnodes.txt"
+      - .:/sources/network/permissions_config.toml"
+    ports:
+      - 127.0.0.1:8545:8545
+      - 127.0.0.1:30303:30303

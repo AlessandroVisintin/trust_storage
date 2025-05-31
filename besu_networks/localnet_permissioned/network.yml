@@ -1,0 +1,19 @@
+accounts_allowlist: false
+nodes_allowlist: false
+accounts:
+  - role: bootnode
+    ip: 127.0.0.1
+    rpc: 8545
+    p2p: 30303
+  - role: bootnode_validator
+    ip: 127.0.0.1
+    rpc: 8546
+    p2p: 30304
+  - role: validator
+    ip: 127.0.0.1
+    rpc: 8547
+    p2p: 30305
+contracts:
+  - name: SimpleStorage
+  - name: HashManager
+  - name: TreeHashManager
