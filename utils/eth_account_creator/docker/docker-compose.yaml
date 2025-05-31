@@ -1,7 +1,0 @@
-services:
-  eth_account_generator:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-    volumes:
-      - ../build:/output

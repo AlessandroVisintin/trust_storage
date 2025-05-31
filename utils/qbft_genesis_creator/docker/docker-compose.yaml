@@ -1,8 +1,0 @@
-services:
-  qbft_genesis_creator:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-    volumes:
-      - ../data:/sources
-      - ../build:/output
