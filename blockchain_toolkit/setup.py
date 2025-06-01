@@ -9,5 +9,7 @@ setup(
         "ecdsa==0.19.1",
         "pycryptodome==3.23.0",
         "pytest==8.3.5",
+        "PyYAML==6.0.2",
+        "rlp==4.1.0"
     ]
 )
