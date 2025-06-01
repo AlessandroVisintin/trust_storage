@@ -43,19 +43,28 @@ class EthAccountGenerator:
 class EthAccountLoader:
 
     @staticmethod
-    def load(filepath: str) -> EthAccount:
-        with open(filepath, 'r') as f:
-            data = json.load(f)
+    def load(folderpath: str) -> EthAccount:
+
+        def _read(name):
+            with open(os.path.join(folderpath, name), 'r') as f:
+                return f.read().strip()
+
         return EthAccount(
-            private_key=data['private_key'],
-            public_key=data['public_key'],
-            eth_address=data['eth_address']
+            private_key=_read('private.key'),
+            public_key=_read('public.key'),
+            eth_address=_read('eth.address')
         )
 
     @staticmethod
-    def dump(account: EthAccount, filepath: str) -> None:
-        with open(filepath, 'w') as f:
-            json.dump(asdict(account), f, indent=2)
+    def dump(account: EthAccount, folderpath: str) -> None:
+
+        def _write(value, name):
+            with open(os.path.join(folderpath, name), 'r') as f:
+                f.write(value)
+        
+        _write(account.private_key, 'private.key')
+        _write(account.public_key, 'private.key')
+        _write(account.eth_address, 'eth.address')
 
 
 class EthAccountRepository:
@@ -65,11 +74,13 @@ class EthAccountRepository:
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
-    def generate(self, num:int=1) -> None:
-      for _ in range(num):
+    def generate(self, name:str) -> None:
+        account_dir = os.path.join(self.folder_path, name)
+        if os.path.exists(account_dir):
+            raise FileExistsError(f"An account named '{name}' already exists.")
         account = EthAccountGenerator.generate()
-        filename = f'{account.eth_address.strip("0x")[:8].lower()}.json'
-        EthAccountLoader.dump(account, os.path.join(self.folder_path, filename))
+        EthAccountLoader.dump(account, account_dir)
+        return account
 
     def get(self, account_address: str) -> EthAccount:
         filepath = os.path.join(self.folder_path, account_address + '.json')
