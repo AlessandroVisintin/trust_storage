@@ -119,13 +119,21 @@ class ConfigManager:
         hard_forks: HardForkManager,
         consensus: ConsensusItem,
         chain_id: int,
+        contract_size_limit: int,
+        zero_base_fee: bool
     ):
         self.hard_forks = hard_forks
         self.consensus = consensus
         self.chain_id = chain_id
+        self.contract_size_limit = contract_size_limit
+        self.zero_base_fee = zero_base_fee
 
     def to_dict(self) -> Dict[str, Any]:
-        cfg = {"chainId": self.chain_id}
+        cfg = {
+            "chainId": self.chain_id,
+            "contractSizeLimit": self.contract_size_limit,
+            "zeroBaseFee": self.zero_base_fee
+            }
         cfg.update(self.hard_forks.to_dict())
         cfg.update(self.consensus.get_config())
         return cfg

@@ -12,15 +12,7 @@ class SmartContract:
     abi: dict
     bin: str
     bin_runtime: str
-    
-    def address(self, prefix:str=None):
-        address_string = self.name
-        if prefix:
-            address_string = f"{prefix}{address_string}"
-        address_hex = address_string.encode().hex()
-        if len(address_hex) >= 40:
-            return to_checksum_address(f"0x{address_hex[:40]}")
-        return to_checksum_address(f"0x{address_hex.ljust(40, '0')}")
+
 
 class SmartContractCompiler:
     
