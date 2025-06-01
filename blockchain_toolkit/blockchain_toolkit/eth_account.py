@@ -59,11 +59,11 @@ class EthAccountLoader:
     def dump(account: EthAccount, folderpath: str) -> None:
 
         def _write(value, name):
-            with open(os.path.join(folderpath, name), 'r') as f:
+            with open(os.path.join(folderpath, name), 'w') as f:
                 f.write(value)
         
         _write(account.private_key, 'private.key')
-        _write(account.public_key, 'private.key')
+        _write(account.public_key, 'public.key')
         _write(account.eth_address, 'eth.address')
 
 
@@ -74,24 +74,17 @@ class EthAccountRepository:
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
-    def generate(self, name:str) -> None:
+    def generate(self, name: str) -> None:
         account_dir = os.path.join(self.folder_path, name)
         if os.path.exists(account_dir):
             raise FileExistsError(f"An account named '{name}' already exists.")
+        os.makedirs(account_dir, exist_ok=False)
         account = EthAccountGenerator.generate()
         EthAccountLoader.dump(account, account_dir)
         return account
 
-    def get(self, account_address: str) -> EthAccount:
-        filepath = os.path.join(self.folder_path, account_address + '.json')
-        if not os.path.exists(filepath):
-            raise FileNotFoundError(f"Account with address {account_address} not found")
-        return EthAccountLoader.load(filepath)
-
-    def remove(self, account_address: str) -> EthAccount:
-        filepath = os.path.join(self.folder_path, account_address + '.json')
-        if not os.path.exists(filepath):
-            raise FileNotFoundError(f"Account with address {account_address} not found")
-        account = EthAccountLoader.load(filepath)
-        os.remove(filepath)
-        return account
+    def get(self, name: str) -> EthAccount:
+        account_dir = os.path.join(self.folder_path, name)
+        if not os.path.exists(account_dir):
+            raise FileNotFoundError(f"Account named {name} not found")
+        return EthAccountLoader.load(account_dir)

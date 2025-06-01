@@ -4,26 +4,13 @@ from pathlib import Path
 from typing import Dict, Any, List
 
 from .eth_account import EthAccountRepository
-from .eth_utils import to_checksum_address
+from .eth_utils import to_checksum_address, EthNode
 
 
 class BaseStrategy:
 
     def execute(self, config_path: str) -> None:
         raise NotImplementedError
-
-
-# class BootnodesManager:
-#     def __init__(self, bootnodes: List[Dict[str, Any]], base_path: Path):
-#         self.bootnodes = bootnodes
-#         self.base_path = base_path / "bootnodes"
-#         self.base_path.mkdir(exist_ok=True)
-
-#     def dump(self):
-
-#         with open(self.base_path / "bootnodes.txt", "w") as f:
-#             for item in self.bootnodes:
-#                 f.write(f"{item['name']}\n")
 
 
 # class ValidatorsManager:
@@ -60,19 +47,30 @@ class Besu20250531Strategy(BaseStrategy):
     REQUIRED_TAG = "besu:2025-05-31"
 
     def execute(self, config_path: str) -> None:
+
         cfg = yaml.safe_load(Path(config_path).read_text())
-        name = cfg["name"]
+
+        # check image
         image = cfg["image"]
         if not image.endswith(f"{self.REQUIRED_TAG}"):
             raise ValueError(f"Config image '{image}' must end with {self.REQUIRED_TAG}")
 
+        # create folder
+        name = cfg["name"]
         root = Path(config_path).parent / name
         root.mkdir(exist_ok=True)
 
+        # create nodes
         nodes_cfg = cfg.get("nodes", [])
         repo = EthAccountRepository(str(root / "nodes"))
         for node in nodes_cfg:
-            repo.generate(name=node["name"])
+            try:
+                account = repo.generate(name=node["name"])
+            except FileExistsError:
+                account = repo.get(name=node["name"])
+            
+            EthNode(account, node["rpc-endpoint"], node["p2p-endpoint"])
+            
 
         # # 2) Dump bootnodes
         # BootnodesManager(cfg.get("bootnodes", []), root).dump()
