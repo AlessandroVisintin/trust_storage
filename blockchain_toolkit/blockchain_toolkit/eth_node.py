@@ -21,6 +21,7 @@ class EthNode:
     account: EthAccount
     rpc_endpoint: RPCEndpoint
     p2p_endpoint: P2PEndpoint
+    bootnode: bool
 
     def enode(self):
         pubkey = self.account.public_key.strip("0x")
