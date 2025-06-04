@@ -39,6 +39,18 @@ class AccountGenerator:
         keccak_hash.update(public_key_bytes)
         address_bytes = keccak_hash.digest()[-20:]
         return to_checksum_address('0x' + address_bytes.hex())
+    
+    @staticmethod
+    def generate(name: str) -> Account:
+        private_key = AccountGenerator.generate_private_key()
+        public_key = AccountGenerator.derive_public_key(private_key)
+        address = AccountGenerator.derive_address(public_key)
+        return Account(
+            name=name,
+            private_key=private_key,
+            public_key=public_key,
+            address=address
+        )
 
 
 class AccountRepository:

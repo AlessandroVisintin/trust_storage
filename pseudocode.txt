@@ -1,0 +1,106 @@
+def generate_boootnodes_file(path/to/docker_compose.yml):
+
+    data = load(path/to/docker_compose.yml)
+    bootnodes = []
+    for service_name, service_data in data.services:
+
+        if not service_data.is_bootnode:
+            continue
+    
+        prvhex = get_private_key_from_name(service_name)
+        pubhex = derive_private_key(prvhex)
+    
+        p2p_binding = [port for port in service_data.ports if port.endswith(":30303")]
+        if not p2p_binding:
+            raise Error
+    
+        p2p_endpoint = p2p_binding.split(":30303")[0]
+        bootnodes.append( f"enode://{pubhex.strip('0x')}@{p2p_endpoint}" )
+
+    for service_name, service_data in data.services:
+
+        node_network_folder = extract_network_folder_binding( service_data.volumes )
+        
+        dump_list_one_per_line(bootnodes, node_network_folder)
+
+
+def generate_permissions_file(path/to/docker_compose.yml):
+
+    data = load(path/to/docker_compose.yml)
+    permissions = {}
+    for service_name, service_data in data.services:
+
+        accounts_allowlist = []
+        for account_name in service_data.accounts_allowlist:
+            accounts_allowlist.append(
+                get_address_by_name(account_name)
+            )
+
+        nodes_allowlist = []
+        for node_name in service_data.nodes_allowlist:
+    
+            prvhex = get_private_key_from_name(service_name)
+            pubhex = derive_private_key(prvhex)
+    
+            p2p_endpoint = get_p2p_endpoint_by_name(node_name)
+    
+            nodes_allowlist.append( f"enode://{pubhex.strip('0x')}@{p2p_endpoint}" )
+        
+        allowlists = {
+            "accounts-allowlist": accounts_allowlist,
+            "nodes-allowlist" : nodes_allowlist
+        }
+
+        node_account_folder = extract_account_folder_binding( service_data.volumes )
+        dump_allowlists_as_toml( allowlists )
+
+
+def generate_private_key_file(path/to/docker_compose.yml):
+
+    data = load(path/to/docker_compose.yml)
+    for service_name, service_data in data.services:
+
+        prvhex = get_private_key_from_name(service_name)
+
+        node_account_folder = extract_account_folder_binding( service_data.volumes )
+
+        dump_private_key_as_txt( prvhex, node_account_folder )
+
+
+def generate_qbft_genesis_file(path/to/docker_compose.yml):
+
+    data = load(path/to/docker_compose.yml)
+
+    alloc = {}
+    if contracts in data:
+        contracts_folder = data.contracts.path
+        for contract in data.contracts.members:
+            
+            if not contract in contracts_folder:
+                raise Error
+            
+            contract_source = load(contract.sol)
+            compiled = compile_contract(contract_source)
+
+            contract_address = calculate_address(contract)
+
+            alloc[contract_address] = {
+                "balance": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                "code": compiled.bin_runtime,
+                "storage":[]
+            }
+    
+    validators = []
+    for service_name, service_data in data.services:
+
+        if service_data.is_validator:
+            validators.append(
+                get_address_by_name(service_name)
+            )
+    
+    extradata = calculate_qbft_extradata(validators)
+
+    template = get_freenet_genesis_template()
+    template["config"]["qbft"] = data.consensus.parameters
+    template["alloc"] = alloc
+    template["extradata"] = extradata

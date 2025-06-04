@@ -1,0 +1,32 @@
+{
+  "coinbase": "0x0000000000000000000000000000000000000000",
+  "config": {
+    "arrowGlacierBlock": 0,
+    "berlinBlock": 0,
+    "byzantiumBlock": 0,
+    "cancunTime": 0,
+    "chainId": 1337,
+    "constantinopleBlock": 0,
+    "contractSizeLimit": 2147483647,
+    "daoForkBlock": 0,
+    "daoForkSupport": true,
+    "eip150Block": 0,
+    "eip150Hash": "0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0",
+    "eip155Block": 0,
+    "eip158Block": 0,
+    "grayGlacierBlock": 0,
+    "homesteadBlock": 0,
+    "istanbulBlock": 0,
+    "londonBlock": 0,
+    "muirGlacierBlock": 0,
+    "parisBlock": 0,
+    "petersburgBlock": 0,
+    "shanghaiTime": 0,
+    "zeroBaseFee": true
+  },
+  "difficulty": "0",
+  "gasLimit": "0x1fffffffffffff",
+  "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "nonce": "0x0000000000000000",
+  "timestamp": "0x0"
+}

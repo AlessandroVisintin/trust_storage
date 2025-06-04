@@ -54,10 +54,17 @@ class ContractRepository:
         with file_path.open('w', encoding='utf-8') as f:
             json.dump(asdict(contract), f, ensure_ascii=False, indent=2)
 
-    def load(self, name: str) -> Contract:
+    def load(self, name: str, compile: bool = True) -> Contract:
         file_path = self.folderpath / f"{name}.json"
-        if not file_path.exists():
-            return None
-        with file_path.open('r', encoding='utf-8') as f:
-            data = json.load(f)
-        return Contract(**data)
+        if file_path.exists():
+            with file_path.open('r', encoding='utf-8') as f:
+                data = json.load(f)
+            return Contract(**data)
+                
+        if compile:
+            source_path = (self.folderpath / f"{name}.sol").resolve()
+            contract = ContractCompiler.compile(source_path)
+            self.save(contract)
+            return contract
+
+        raise FileNotFoundError(f"{file_path} not found")
