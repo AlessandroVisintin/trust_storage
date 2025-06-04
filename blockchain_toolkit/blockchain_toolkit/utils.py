@@ -16,9 +16,3 @@ def to_checksum_address(eth_address) -> str:
         else:
             checksummed += char
     return "0x" + checksummed
-
-def snake_case_to_camel_case(value: str) -> str:
-    data_list: list[str] = value.split("_")
-    for i in range(1, len(data_list)):
-        data_list[i] = data_list[i][0].upper() + data_list[i][1:]
-    return "".join(data_list)
