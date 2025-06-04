@@ -27,7 +27,7 @@ services:
     x-node-config:
       is_bootnode: true
       is_validator: true
-      accounts-allowlist:
-        - node-0
-      nodes-allowlist:
-        - node-0
+      # accounts-allowlist:
+      #   - node-0
+      # nodes-allowlist:
+      #   - node-0

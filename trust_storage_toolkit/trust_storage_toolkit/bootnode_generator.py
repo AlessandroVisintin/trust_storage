@@ -7,7 +7,7 @@ class BootnodeGenerator(BaseGenerator):
     
     def generate(self, config: NetworkConfig) -> None:
         bootnodes = self._collect_bootnodes(config)
-        self._write_bootnode_files(config, bootnodes)
+        self._write_bootnode_files(bootnodes)
     
     def _collect_bootnodes(self, config: NetworkConfig) -> List[str]:
         bootnodes = []
@@ -24,12 +24,9 @@ class BootnodeGenerator(BaseGenerator):
         
         return bootnodes
     
-    def _write_bootnode_files(self, config: NetworkConfig, bootnodes: List[str]) -> None:
-        for service in config.services.values():
-            network_folder = self._extract_network_folder_binding(service.volumes)
-            bootnode_file = network_folder / "bootnodes.txt"
-            
-            bootnode_file.parent.mkdir(parents=True, exist_ok=True)
-            with open(bootnode_file, 'w') as f:
-                for bootnode in bootnodes:
-                    f.write(f"{bootnode}\n")
+    def _write_bootnode_files(self, bootnodes: List[str]) -> None:
+        bootnode_file = self.base_path / "bootnodes.txt"
+        bootnode_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(bootnode_file, 'w') as f:
+            for bootnode in bootnodes:
+                f.write(f"{bootnode}\n")

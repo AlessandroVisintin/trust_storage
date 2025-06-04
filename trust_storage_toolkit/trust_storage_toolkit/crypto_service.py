@@ -1,13 +1,31 @@
 # services/crypto_service.py
 import secrets
+import re
 from typing import Dict, List
 from Crypto.Hash import keccak
 from ecdsa import SigningKey, SECP256k1
-from eth_utils import to_checksum_address
 import rlp
 
 
 class CryptoService:
+
+    @staticmethod
+    def to_checksum_address(eth_address: str) -> str:
+        address_lower = re.sub(r'0x', '', eth_address).lower()
+
+        hash_obj = keccak.new(digest_bits=256)
+        hash_obj.update(address_lower.encode('utf-8'))
+        hash_hex = hash_obj.hexdigest()
+        checksummed = ""
+        for i, char in enumerate(address_lower):
+            if char in 'abcdef':
+                if int(hash_hex[i], 16) >= 8:
+                    checksummed += char.upper()
+                else:
+                    checksummed += char
+            else:
+                checksummed += char
+        return "0x" + checksummed
     
     def __init__(self):
         self._private_keys: Dict[str, str] = {}
@@ -29,7 +47,7 @@ class CryptoService:
         keccak_hash = keccak.new(digest_bits=256)
         keccak_hash.update(public_key_bytes)
         address_bytes = keccak_hash.digest()[-20:]
-        return to_checksum_address('0x' + address_bytes.hex())
+        return CryptoService.to_checksum_address('0x' + address_bytes.hex())
     
     def get_private_key_by_name(self, name: str) -> str:
         if name not in self._private_keys:
@@ -49,9 +67,8 @@ class CryptoService:
         return self._addresses[name]
     
     def calculate_qbft_extradata(self, validators: List[str]) -> str:
-        """Calculate QBFT extradata for genesis block."""
         vanity = b'\x00' * 32
-        decoded = [bytes.fromhex(v.strip("0x")) for v in validators]
+        decoded = [bytes.fromhex(re.sub(r'0x', '', v)) for v in validators]
         vote = []
         round_number = 0
         seals = []

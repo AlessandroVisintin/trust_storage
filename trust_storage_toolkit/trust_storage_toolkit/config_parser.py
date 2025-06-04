@@ -8,6 +8,7 @@ from .models import NetworkConfig, ServiceConfig, NodeConfig, ConsensusConfig, C
 class ConfigParser:
     
     def parse(self, config_path: Path) -> NetworkConfig:
+
         with open(config_path, 'r') as file:
             data = yaml.safe_load(file)
         
@@ -26,8 +27,10 @@ class ConfigParser:
     def _parse_contracts(self, contracts_data: Dict[str, Any]) -> Optional[ContractConfig]:
         if not contracts_data:
             return None
+        
+        contracts_path = contracts_data.get('path', '')
         return ContractConfig(
-            path=contracts_data.get('path', ''),
+            path=str(contracts_path),
             members=contracts_data.get('members', [])
         )
     

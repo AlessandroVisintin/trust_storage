@@ -6,11 +6,13 @@ from typing import Dict, Any, List
 from .base_generator import BaseGenerator
 from .models import NetworkConfig
 from .contract_service import ContractService
+from .crypto_service import CryptoService
+
 
 class GenesisGenerator(BaseGenerator):
     
-    def __init__(self, crypto_service, contract_service: ContractService):
-        super().__init__(crypto_service)
+    def __init__(self, crypto_service: CryptoService, contract_service: ContractService, base_path: Path):
+        super().__init__(crypto_service, base_path)
         self.contract_service = contract_service
     
     def generate(self, config: NetworkConfig, template_path: Path, output_path: Path) -> None:
@@ -26,7 +28,7 @@ class GenesisGenerator(BaseGenerator):
         validators = self._collect_validators(config)
         genesis["extraData"] = self.crypto_service.calculate_qbft_extradata(validators)
         
-        self._write_genesis_file(genesis, output_path)
+        self._write_genesis_file(genesis)
     
     def _load_template(self, template_path: Path) -> Dict[str, Any]:
         with open(template_path, 'r') as f:
@@ -34,7 +36,7 @@ class GenesisGenerator(BaseGenerator):
     
     def _process_contracts(self, contracts_config) -> Dict[str, Any]:
         alloc = {}
-        contracts_path = Path(contracts_config.path)
+        contracts_path = self.base_path / Path(contracts_config.path)
         
         for contract_name in contracts_config.members:
             contract_file = contracts_path / f"{contract_name}.sol"
@@ -60,7 +62,8 @@ class GenesisGenerator(BaseGenerator):
                 validators.append(self.crypto_service.get_address_by_name(service.name))
         return validators
     
-    def _write_genesis_file(self, genesis: Dict[str, Any], output_path: Path) -> None:
+    def _write_genesis_file(self, genesis: Dict[str, Any])-> None:
+        output_path = self.base_path / "genesis.json"
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, 'w') as f:
             json.dump(genesis, f, indent=2)

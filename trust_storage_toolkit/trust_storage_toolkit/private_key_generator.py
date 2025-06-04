@@ -19,12 +19,7 @@ class PrivateKeyGenerator(BaseGenerator):
     def _dump_private_key_as_txt(self, private_key: str, account_folder: Path) -> None:
         account_folder.mkdir(parents=True, exist_ok=True)
         key_file = account_folder / "key"
-
-        with open(key_file, 'w') as f:
-            f.write(private_key.strip('0x'))  # Remove 0x prefix for raw hex
         
-        key_priv_file = account_folder / "key.priv"
+        key_priv_file = account_folder / "private.key"
         with open(key_priv_file, 'w') as f:
-            f.write(private_key)  # Keep 0x prefix for this one
-        
-        print(f"Generated private key file for {account_folder.name}")
+            f.write(private_key) 

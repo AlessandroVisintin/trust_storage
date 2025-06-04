@@ -2,6 +2,7 @@ import solcx
 from pathlib import Path
 
 from .models import Contract
+from .crypto_service import CryptoService
 
 
 class ContractService:
@@ -39,4 +40,9 @@ class ContractService:
         )
     
     def calculate_contract_address(self, contract_name: str) -> str:
-        return f"0x{contract_name.encode().hex()[:40].ljust(40, '0')}"
+        address_string = f"Rescale{contract_name}"
+        address_hex = address_string.encode().hex()
+
+        if len(address_hex) >= 40:
+            return CryptoService.to_checksum_address(f"0x{address_hex[:40]}")
+        return CryptoService.to_checksum_address(f"0x{address_hex.ljust(40, '0')}")
