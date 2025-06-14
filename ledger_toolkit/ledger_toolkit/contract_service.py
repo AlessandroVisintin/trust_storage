@@ -1,3 +1,4 @@
+import json
 import solcx
 from dataclasses import dataclass
 from typing import List, Dict
@@ -34,14 +35,16 @@ class ContractService:
         )
         
         contract_name = source_path.stem
-        contract_key = next(
-            k for k in compiled.keys() if k.endswith(f":{contract_name}")
-        )
+        contract_key = next((k for k in compiled if k.endswith(f":{contract_name}")), None)
+
+        if not contract_key:
+            raise KeyError(f"Could not find contract '{contract_name}' in compiled output.")
+        
         contract_data = compiled[contract_key]
         
         return Contract(
             name=contract_name,
-            abi=contract_data['abi'],
-            bin=contract_data['bin'],
-            bin_runtime=contract_data['bin-runtime']
+            abi=contract_data["abi"],
+            bin=contract_data["bin"],
+            bin_runtime=contract_data["bin-runtime"]
         )

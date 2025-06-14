@@ -27,10 +27,14 @@ class QbftGenesisGenerator(BaseGenerator):
     def generate(self, config: NetworkConfig) -> None:
         if not config.consensus.name == "qbft":
             raise ValueError("Configuration consensus is not QBFT")
+        
         genesis = self._load_template(self.genesis_template_path)
         genesis["config"]["qbft"] = config.consensus.parameters
+        
         if config.contracts:
-            genesis["alloc"] = self._process_contracts(config.contracts)
+            genesis["alloc"], contracts_metadata = self._process_contracts(config.contracts)
+            self._write_contracts_manifest(contracts_metadata)
+
         validators = self._collect_validators(config)
         genesis["extraData"] = calculate_qbft_extradata(validators)
         
@@ -44,6 +48,7 @@ class QbftGenesisGenerator(BaseGenerator):
         alloc = {}
         contracts_path = self.base_path / Path(contracts_config.path)
         
+        metadata = {}
         for contract_name in contracts_config.members:
             contract_file = contracts_path / f"{contract_name}.sol"
             
@@ -58,8 +63,13 @@ class QbftGenesisGenerator(BaseGenerator):
                 "code": compiled_contract.bin_runtime,
                 "storage": {}
             }
+
+            metadata[contract_name] = {
+                "address": contract_address,
+                "abi": compiled_contract.abi
+            }
         
-        return alloc
+        return alloc, metadata
     
     def _collect_validators(self, config: NetworkConfig) -> List[str]:
         validators = []
@@ -73,3 +83,9 @@ class QbftGenesisGenerator(BaseGenerator):
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, 'w') as f:
             json.dump(genesis, f, indent=2)
+
+    def _write_contracts_manifest(self, contracts_metadata: Dict[str, Any]) -> None:
+        output_path = self.base_path / "contracts.json"
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, "w") as f:
+            json.dump(contracts_metadata, f, indent=2)
