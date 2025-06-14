@@ -31,7 +31,7 @@ def parse_events_from_receipt(contract: Contract, receipt: TxReceipt) -> list[Ev
                 event_name=log.event,
                 event_results=dict(log.args)
             )
-        parsed_events.append(event_data)
+            parsed_events.append(event_data)
     return parsed_events
 
 def parse_response_from_receipt(contract: Contract, receipt: TxReceipt) -> BlockchainResponse:        
