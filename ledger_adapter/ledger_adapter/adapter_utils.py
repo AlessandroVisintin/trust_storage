@@ -20,11 +20,6 @@ def to_0xhex(value):
         return '0x' + value
     return value
 
-def send_and_wait_transaction(w3_provider, transaction, private_key):
-    signed_tx = w3_provider.eth.account.sign_transaction(transaction, private_key)
-    tx_hash = w3_provider.eth.send_raw_transaction(signed_tx.raw_transaction)
-    return w3_provider.eth.wait_for_transaction_receipt(tx_hash)
-
 def parse_events_from_receipt(contract: Contract, receipt: TxReceipt) -> list[EventDetails]:
     parsed_events = []
     for event_abi in [abi for abi in contract.abi if abi['type'] == 'event']:

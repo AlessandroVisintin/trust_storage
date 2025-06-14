@@ -3,6 +3,7 @@ from typing import Dict, List, Any
 
 from .base_contract import BaseContract
 from .simple_storage import SimpleStorage
+from .hash_manager import HashManager
 
 
 class ContractFactory:
@@ -13,7 +14,8 @@ class ContractFactory:
             self._manifest: Dict[str, Any] = json.load(f)
 
         self._class_map: Dict[str, type[BaseContract]] = {
-            "SimpleStorage": SimpleStorage
+            "SimpleStorage": SimpleStorage,
+            "HashManager": HashManager
         }
 
     def get_contract(self, name: str) -> BaseContract:
